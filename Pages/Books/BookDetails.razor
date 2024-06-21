@@ -1,0 +1,149 @@
+﻿@page "/book-details/{Id}"
+@using MudBlazor
+@using MudBlazor.Components
+@using ZNSTLibrary.Data.Models
+@using ZNSTLibrary.Services.Books
+@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+@inject IBooksService _bookService
+
+@* <MudContainer>
+    @if (book == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <MudText Typo="Typo.h4">@book.Title</MudText>
+        <MudText><strong>ISBN:</strong> @book.ISBN</MudText>
+        <MudText><strong>Price:</strong> @book.Price</MudText>
+        <MudText><strong>Available for Sale:</strong> @(book.isAvailableForSale ? "Yes" : "No")</MudText>
+        <MudText><strong>Available for Borrow:</strong> @(book.isAvailableForBorrow ? "Yes" : "No")</MudText>
+        <MudText><strong>Available for Reservation:</strong> @(book.isAvailableForReservation ? "Yes" : "No")</MudText>
+        <MudText><strong>Available for Exchange:</strong> @(book.isAvailableForExchange ? "Yes" : "No")</MudText>
+        <MudText><strong>Author:</strong> @book.AuthorName</MudText>
+        <MudText><strong>Publisher:</strong> @book.Publisher.Name</MudText>
+        <MudText><strong>Category:</strong> @book.Category.Name</MudText>
+        <MudText><strong>Language:</strong> @book.Language</MudText>
+        <MudText><strong>Pages:</strong> @book.Pages</MudText>
+        <MudText><strong>Year:</strong> @book.Year</MudText>
+        <MudText><strong>Description:</strong> @book.Description</MudText>
+        <MudText><strong>Number of Copies:</strong> @book.NumberOfCopies</MudText>
+        <MudText><strong>Number of Available Copies:</strong> @book.NumberOfAvailableCopies</MudText>
+        <MudText><strong>Number of Borrowed Copies:</strong> @book.NumberOfBorrowedCopies</MudText>
+        <MudText><strong>Number of Reserved Copies:</strong> @book.NumberOfReservedCopies</MudText>
+        <MudText><strong>Number of Lost Copies:</strong> @book.NumberOfLostCopies</MudText>
+        <MudText><strong>Number of Damaged Copies:</strong> @book.NumberOfDamagedCopies</MudText>
+    }
+</MudContainer> *@
+<MudContainer>
+    @if (book == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <MudGrid>
+            <MudItem xs="12" sm="4">
+                <MudCard>
+                    <MudCardHeader>
+                        <CardHeaderAvatar>
+                            <MudAvatar Color="Color.Secondary">I</MudAvatar>
+                        </CardHeaderAvatar>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.body1">@book.Title</MudText>
+                            <MudText Typo="Typo.body2">@book.Author.Name</MudText>
+                            
+                        </CardHeaderContent>                       
+                    </MudCardHeader>
+                    <MudCardMedia Image="@book.BookUrl" Height="250" />
+                    <MudImage Src="@book.BookUrl">
+
+                    </MudImage>
+                    <MudCardContent>
+                        <MudText Typo="Typo.body2">Available in @book.Language</MudText>
+                        <MudText Typo="Typo.body2">@book.Description</MudText>
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudIconButton Icon="@Icons.Material.Filled.Favorite" Color="Color.Default" />
+                        <MudIconButton Icon="@Icons.Material.Filled.Share" Color="Color.Default" />
+                    </MudCardActions>
+                </MudCard>
+            </MudItem>
+            <MudItem xs="12" sm="8">
+                <MudPaper>
+                    <MudText Typo="Typo.h5">Basic Information</MudText>
+                    <MudDivider class="my-2" />
+                    <MudText><strong>ISBN:</strong> @book.ISBN</MudText>
+                    <MudText><strong>Price:</strong> @book.Price</MudText>
+                    <MudText><strong>Language:</strong> @book.Language</MudText>
+                    <MudText><strong>Pages:</strong> @book.Pages</MudText>
+                    <MudText><strong>Year:</strong> @book.Year</MudText>
+                </MudPaper>
+            </MudItem>
+
+            <MudItem xs="12">
+                <MudPaper>
+                    <MudText Typo="Typo.h5">Availability</MudText>
+                    <MudDivider class="my-2" />
+                    <MudText><strong>Available for Sale:</strong> @(book.isAvailableForSale ? "Yes" : "No")</MudText>
+                    <MudText><strong>Available for Borrow:</strong> @(book.isAvailableForBorrow ? "Yes" : "No")</MudText>
+                    <MudText><strong>Available for Reservation:</strong> @(book.isAvailableForReservation ? "Yes" : "No")</MudText>
+                    <MudText><strong>Available for Exchange:</strong> @(book.isAvailableForExchange ? "Yes" : "No")</MudText>
+                </MudPaper>
+            </MudItem>
+
+            <MudItem xs="12">
+                <MudPaper>
+                    <MudText Typo="Typo.h5">People</MudText>
+                    <MudDivider class="my-2" />
+                    <MudText><strong>Author:</strong> @book.AuthorName</MudText>
+                    <MudText><strong>Publisher:</strong> @book.Publisher.Name</MudText>
+                    <MudText><strong>Category:</strong> @book.Category.Name</MudText>
+                </MudPaper>
+            </MudItem>
+
+            <MudItem xs="12">
+                <MudPaper>
+                    <MudText Typo="Typo.h5">Description</MudText>
+                    <MudDivider class="my-2" />
+                    <MudText>@book.Description</MudText>
+                </MudPaper>
+            </MudItem>
+
+            <MudItem xs="12">
+                <MudPaper>
+                    <MudText Typo="Typo.h5">Copies Information</MudText>
+                    <MudDivider class="my-2" />
+                    <MudText><strong>Number of Copies:</strong> @book.NumberOfCopies</MudText>
+                    <MudText><strong>Number of Available Copies:</strong> @book.NumberOfAvailableCopies</MudText>
+                    <MudText><strong>Number of Borrowed Copies:</strong> @book.NumberOfBorrowedCopies</MudText>
+                    <MudText><strong>Number of Reserved Copies:</strong> @book.NumberOfReservedCopies</MudText>
+                    <MudText><strong>Number of Lost Copies:</strong> @book.NumberOfLostCopies</MudText>
+                    <MudText><strong>Number of Damaged Copies:</strong> @book.NumberOfDamagedCopies</MudText>
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+    }
+</MudContainer>
+
+
+@code {
+    [Parameter]
+    public string Id { get; set; } = "";
+    private Book book = null!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var res = await _bookService.GetBook(Id);
+        if (res != null)
+        {
+
+            book = res!;
+        }
+        book = res!;
+        // StateHasChanged();
+        // Fetch book details by Id from API
+        // Example: book = await HttpClient.GetFromJsonAsync<Book>($"api/books/{Id}");
+    }
+}

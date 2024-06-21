@@ -1,0 +1,46 @@
+﻿@page "/book-rentals"
+@using MudBlazor
+@using MudBlazor.Components
+@using ZNSTLibrary.Data.Models
+@inject HttpClient HttpClient
+
+@if (rentals == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <MudTable Items="@rentals" T="BookRental" @bind-SelectedItem="selectedRental">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Book Rentals</MudText>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>Book ID</MudTh>
+            <MudTh>User ID</MudTh>
+            <MudTh>Rental Date</MudTh>
+            <MudTh>Return Date</MudTh>
+            <MudTh>Is Returned</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Book ID">@context.BookId</MudTd>
+            <MudTd DataLabel="User ID">@context.UserId</MudTd>
+            <MudTd DataLabel="Rental Date">@context.RentalDate.ToShortDateString()</MudTd>
+            <MudTd DataLabel="Return Date">@context.ReturnDate.ToShortDateString()</MudTd>
+            <MudTd DataLabel="Is Returned">@context.IsReturned ? "Yes" : "No"</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[] { 10, 25, 50, 100 }" />
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+    private List<BookRental> rentals = new List<BookRental>();
+    private BookRental selectedRental = new BookRental();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Fetch all rentals from API
+        // rentals = await HttpClient.GetFromJsonAsync<List<BookRental>>("api/bookRentals");
+    }
+}

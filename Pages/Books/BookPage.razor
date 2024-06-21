@@ -1,0 +1,69 @@
+﻿@page "/courses/{courseId}"
+@* @using codesome.Data
+@using codesome.Data.Courses
+@using codesome.Data.Models
+@using codesome.Data.Services.Courses
+@using codesome.Data.Services.Lessons
+@using codesome.Pages.Lessons
+@inject ICoursesService _coursesService
+@inject NavigationManager NavigationManager
+@inject IDialogService DialogService
+@inject ILessonsService _lessonsService
+
+<PageTitle>Course View</PageTitle>
+
+
+<h1>Course View</h1>
+<p>@course.Title</p>
+
+<MudButton OnClick="OpenAddLessonModal">
+    Add Lesson
+</MudButton>
+
+
+<MudGrid>
+    <MudItem xs="12" sm="12">
+        <MudText Typo="Typo.h4"><MudNavLink Href="/" Match="NavLinkMatch.Prefix">Codesome</MudNavLink></MudText>
+        <MudText Typo="Typo.h4">Course View</MudText>
+    </MudItem>
+
+    <MudItem xs="12" sm="12">
+        <MudText Typo="Typo.h4">@course.Title</MudText>
+    </MudItem>
+    <MudItem xs="12" sm="12">
+        
+    </MudItem>
+</MudGrid>
+
+
+@code {
+    private Course course = new Course();
+
+    private List<Lesson> lessons = new List<Lesson>();
+
+    [Parameter]
+    public string? courseId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        var res = await _coursesService.GetCourseAsync(courseId!);
+        var res2 = await _lessonsService.GetCourseLessonsAsync(courseId!);
+        if (res != null)
+        {
+            course = res;
+            lessons = res2;
+        }
+        // var lessonsResponse = await
+    }
+
+    void OpenAddLessonModal()
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var parameters = new DialogParameters<AddLesson>
+            {
+                { x => x.courseId, courseId }
+            };
+        DialogService.Show<AddLesson>("Add Lesson", parameters, options);
+    }
+} *@

@@ -1,0 +1,42 @@
+﻿@page "/publisher-details/{Id}"
+@using MudBlazor
+@using MudBlazor.Components
+@using ZNSTLibrary.Data.Models
+@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+
+<MudContainer>
+    @if (publisher == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <MudText Typo="Typo.h4">@publisher.Name</MudText>
+        <MudText><strong>Description:</strong> @publisher.Description</MudText>
+        <MudText><strong>Website:</strong> @publisher.Website</MudText>
+        <MudText><strong>Email:</strong> @publisher.Email</MudText>
+        <MudText><strong>Phone:</strong> @publisher.PhoneNumber</MudText>
+        <MudText><strong>Address:</strong> @publisher.Address</MudText>
+        <MudText><strong>City:</strong> @publisher.City</MudText>
+        <MudText><strong>Country:</strong> @publisher.Country</MudText>
+        <MudText><strong>Postal Code:</strong> @publisher.PostalCode</MudText>
+        <MudText><strong>Contact Person:</strong> @publisher.ContactPerson</MudText>
+        <MudText><strong>Contact Person Email:</strong> @publisher.ContactPersonEmail</MudText>
+        <MudText><strong>Contact Person Phone:</strong> @publisher.ContactPersonPhoneNumber</MudText>
+        <MudText><strong>Contact Person Position:</strong> @publisher.ContactPersonPosition</MudText>
+        <MudText><strong>Logo:</strong> <img src="@publisher.LogoUrl" alt="Publisher Logo" /></MudText>
+    }
+</MudContainer>
+
+@code {
+    [Parameter]
+    public string Id { get; set; } = "";
+    private Publisher publisher = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Fetch publisher details by Id from API
+        // Example: publisher = await HttpClient.GetFromJsonAsync<Publisher>($"api/publishers/{Id}");
+    }
+}

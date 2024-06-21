@@ -1,0 +1,80 @@
+﻿@page "/register"
+@layout AuthLayout
+@using System.ComponentModel.DataAnnotations
+@using ZNSTLibrary.Data.Services.Users
+@using ZNSTLibrary.Services.EmailService
+@inject NavigationManager NavigationManager
+@inject IUserService _userService
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject IJSRuntime JSRuntime
+@inject ISnackbar Snackbar
+@inject ILocalStorageService LocalStorage
+@inject IEmailService _emailService
+
+
+<PageTitle>Sign Up</PageTitle>
+
+<MudGrid>
+    <MudItem>
+        <MudText Typo="Typo.h4"><MudNavLink Href="/" Match="NavLinkMatch.Prefix">Codesome</MudNavLink></MudText>
+        <MudText Typo="Typo.h4">Registration</MudText>
+    </MudItem>
+</MudGrid>
+<EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator />
+    <MudGrid>
+        <MudItem xs="12" sm="12">
+            <MudCard>
+                <MudCardContent>
+                    <MudGrid>
+                        <MudItem xs="12" sm="4">
+                            <MudTextField Label="First name" HelperText="Max. 8 characters"
+                                          @bind-Value="model.FirstName" For="@(() => model.FirstName)" />
+                        </MudItem>
+                        <MudItem xs="12" sm="4">
+                            <MudTextField Label="Last name" HelperText="Max. 8 characters"
+                                          @bind-Value="model.LastName" For="@(() => model.LastName)" />
+                        </MudItem>
+                        <MudItem xs="12" sm="4">
+                            <MudTextField Label="User name" HelperText="Max. 8 characters"
+                                          @bind-Value="model.Username" For="@(() => model.Username)" />
+                        </MudItem>
+                        <MudItem xs="12" sm="4">
+                            <MudTextField Label="Phone Number" HelperText="Max. 8 characters"
+                                          @bind-Value="model.PhoneNumber" For="@(() => model.PhoneNumber)" />
+                        </MudItem>
+                        <MudItem xs="12" sm="4">
+                            <MudSelect Margin="Margin.Dense" T="string" Label="Role" Variant="Variant.Outlined" @bind-Value="model.Role" For="@(() => model.Role)">
+                                <MudSelectItem Value="@("Student")" />
+                                <MudSelectItem Value="@("Instructor")" />
+                                <MudSelectItem Value="@("Administrator")" />
+                            </MudSelect>
+                        </MudItem>
+                        <MudItem xs="12" sm="4">
+                            <MudDatePicker Label="Date of Birth"
+                                DateFormat="dd-MM-yyyy"
+                                           IsDateDisabledFunc="@((DateTime dt)=>((int)dt.Year > DateTime.Now.Year - 4))" />
+                        </MudItem>
+                        <MudItem xs="12" sm="4">
+                            <MudTextField Label="Email" Class="mt-3"
+                                          @bind-Value="model.Email" For="@(() => model.Email)" />
+                        </MudItem>
+                        <MudItem xs="12" sm="4">
+                            <MudTextField Label="Password" HelperText="Choose a strong password" Class="mt-3"
+                                          @bind-Value="model.Password" For="@(() => model.Password)" InputType="InputType.Password" />
+                        </MudItem>
+                        <MudItem xs="12" sm="4">
+                            <MudTextField Label="Confirmation Password" HelperText="Confirm password" Class="mt-3"
+                                          @bind-Value="model.Password2" For="@(() => model.Password2)" InputType="InputType.Password" />
+                        </MudItem>
+                    </MudGrid>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Register</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+<MudButton  Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="SendMail">SendEmail</MudButton>

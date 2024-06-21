@@ -1,0 +1,56 @@
+﻿@page "/authors/edit/{Id}"
+@using ZNSTLibrary.Data.Models
+
+<EditForm Model="@author" OnValidSubmit="@HandleValidSubmit">
+    <MudCard>
+        <MudCardContent>
+            <MudGrid>
+                <MudItem md="4" xs="12">
+                    <MudTextField @bind-Value="author.Name" Label="Name" Required="true" />
+                </MudItem>
+                <MudItem md="4" xs="12">
+                    <MudTextField @bind-Value="author.Description" Label="Description" Required="true" />
+                </MudItem>
+                <MudItem md="4" xs="12">
+                    <MudTextField @bind-Value="author.PhotoUrl" Label="Photo URL" Required="true" />
+                </MudItem>
+                <MudItem md="4" xs="12">
+                    <MudTextField @bind-Value="author.Website" Label="Website" Required="true" />
+                </MudItem>
+                <MudItem md="4" xs="12">
+                    <MudTextField @bind-Value="author.Email" Label="Email" Required="true" />
+                </MudItem>
+                <MudItem md="4" xs="12">
+                    <MudTextField @bind-Value="author.PhoneNumber" Label="Phone Number" Required="true" />
+                </MudItem>
+                <MudItem md="4" xs="12">
+                    <MudTextField @bind-Value="author.Address" Label="Address" Required="true" />
+                </MudItem>
+                <MudItem md="4" xs="12">
+                    <MudTextField @bind-Value="author.City" Label="City" Required="true" />
+                </MudItem>
+                <MudItem md="4" xs="12">
+                    <MudTextField @bind-Value="author.Country" Label="Country" Required="true" />
+                </MudItem>
+                <MudItem md="4" xs="12">
+                    <MudTextField @bind-Value="author.PostalCode" Label="Postal Code" Required="true" />
+                </MudItem>
+            </MudGrid>
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary">Submit</MudButton>
+        </MudCardActions>
+    </MudCard>
+</EditForm>
+
+@code {
+    [Parameter]
+    public string Id { get; set; } = "";
+    private Author author = new Author();
+
+    private void HandleValidSubmit()
+    {
+        // Handle form submission logic here
+        Console.WriteLine("Form submitted successfully!");
+    }
+}

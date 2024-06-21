@@ -1,0 +1,32 @@
+﻿@page "/create-book-rental"
+@using MudBlazor
+@using MudBlazor.Components
+@using ZNSTLibrary.Data.Models
+@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+
+<MudPaper Class="p-4">
+    <MudText Typo="Typo.h5">Create Book Rental</MudText>
+    <EditForm Model="@bookRental" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <MudTextField Label="Book ID" @bind-Value="bookRental.BookId" Required="true" />
+        <MudTextField Label="User ID" @bind-Value="bookRental.UserId" Required="true" />
+        <MudDatePicker Label="Rental Date" @bind-Value="bookRental.RentalDate" Required="true" />
+        <MudDatePicker Label="Return Date" @bind-Value="bookRental.ReturnDate" Required="true" />
+        <MudSwitch Label="Is Returned" @bind-Value="bookRental.IsReturned" />
+
+        <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled">Create Rental</MudButton>
+    </EditForm>
+</MudPaper>
+
+@code {
+    private BookRental bookRental = new BookRental();
+    private MudForm form = new MudForm();
+
+    private async Task HandleValidSubmit()
+    {
+        // API call to create book rental
+        // await HttpClient.PostAsJsonAsync("api/bookRentals", bookRental);
+        NavigationManager.NavigateTo("/book-rentals");
+    }
+}

@@ -1,0 +1,30 @@
+﻿@page "/"
+@layout MainLayout
+
+@using System.Net.Http.Headers;
+@using System.Security.Claims
+@inject HttpClient Http
+@* @inject ILocalStorageService _localStorage
+@inject ISnackbar Snackbar *@
+@inject NavigationManager Navigation
+
+<PageTitle>Codesome</PageTitle>
+
+<AuthorizeView>
+    <Authorized>
+        <MudGrid Class="mt-10">
+            <MudItem>
+                <MudText Typo="Typo.h4">Welcome @context.User.Identity!.Name to Codesome</MudText>
+            </MudItem>
+        </MudGrid>
+    </Authorized>
+</AuthorizeView>
+
+
+
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; } = Task.FromResult(new AuthenticationState(new ClaimsPrincipal()));
+    
+}
