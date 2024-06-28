@@ -7,6 +7,7 @@ using System.Net.Mail;
 using System.Net;
 using System.Text;
 using ZNSTLibrary.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace ZNSTLibrary.Data.Services.Users
 {
@@ -80,9 +81,13 @@ namespace ZNSTLibrary.Data.Services.Users
             throw new NotImplementedException();
         }
 
-        public Task<List<User>> GetUsers()
+        public async Task<List<User>> GetUsers()
         {
-            throw new NotImplementedException();
+            if (_context.Users == null)
+            {
+                return new List<User>();
+            }
+            return await _context.Users.Where(_ => _.Role == "Member").ToListAsync();
         }
 
         /*                public Task<UserSession> CreateUserAsync(User user)

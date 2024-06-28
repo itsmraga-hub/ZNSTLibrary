@@ -17,8 +17,18 @@
             <MudText Typo="Typo.h5">Create Book Rental</MudText>
             <EditForm Model="@bookRental" OnValidSubmit="HandleValidSubmit">
                 <DataAnnotationsValidator />
-                <MudTextField Label="Book ID" @bind-Value="bookRental.BookId" Required="true" />
-                <MudTextField Label="User ID" @bind-Value="bookRental.UserId" Required="true" />
+                <MudSelect T="string" Required="true" HelperText="@value" @bind-Value="bookRental.BookId" Variant="Variant.Outlined" Label="Select Book" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown">
+                    @foreach (var book in books)
+                    {
+                        <MudSelectItem T="string" Value="@book.Id">@book.Title</MudSelectItem>
+                    }
+                </MudSelect>
+                <MudSelect T="string" Required="true" HelperText="@value" @bind-Value="bookRental.BookId" Variant="Variant.Outlined" Label="Select Member" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown">
+                    @foreach (var user in users)
+                    {
+                        <MudSelectItem T="string" Value="@user.Id">@user.FirstName @user.LastName</MudSelectItem>
+                    }
+                </MudSelect>
                 <MudDatePicker Label="Rental Date" @bind-Value="bookRental.RentalDate" Required="true" />
                 <MudDatePicker Label="Return Date" @bind-Value="bookRental.ReturnDate" Required="true" />
                 <MudSwitch Label="Is Returned" @bind-Value="bookRental.IsReturned" />
@@ -37,6 +47,8 @@
     private MudForm form = new MudForm();
     private List<Book> books = new List<Book>();
     private List<User> users = new List<User>();
+
+    private string value = "Select a book";
 
     protected override async Task OnInitializedAsync()
     {
