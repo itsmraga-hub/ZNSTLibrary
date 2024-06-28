@@ -12,5 +12,7 @@ namespace ZNSTLibrary.Services.Books
 
         Task<CustomResponse> UpdateBook(string id, Book book);
         Task<CustomResponse> DeleteBook(string id);
+
+        Task<CustomResponse> ReserveBook(BookReservation bookReservation);
     }
 }

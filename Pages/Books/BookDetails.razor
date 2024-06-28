@@ -1,11 +1,17 @@
 ﻿@page "/book-details/{Id}"
 @using MudBlazor
 @using MudBlazor.Components
+@using ZNSTLibrary.Authentication
 @using ZNSTLibrary.Data.Models
+@using ZNSTLibrary.Pages.Reservations
 @using ZNSTLibrary.Services.Books
 @inject HttpClient HttpClient
 @inject NavigationManager NavigationManager
 @inject IBooksService _bookService
+@inject IDialogService DialogService
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject ILocalStorageService _localStorage
 
 @* <MudContainer>
     @if (book == null)
@@ -53,6 +59,8 @@
                         <CardHeaderContent>
                             <MudText Typo="Typo.body1">@book.Title</MudText>
                             <MudText Typo="Typo.body2">@book.Author.Name</MudText>
+                            <MudText Typo="Typo.body2">@book.ISBN</MudText>
+                            <MudText Typo="Typo.body2">Pages: @book.Pages</MudText>
                             
                         </CardHeaderContent>                       
                     </MudCardHeader>
@@ -65,7 +73,7 @@
                         <MudText Typo="Typo.body2">@book.Description</MudText>
                     </MudCardContent>
                     <MudCardActions>
-                        <MudIconButton Icon="@Icons.Material.Filled.Favorite" Color="Color.Default" />
+                        <MudIconButton OnClick="Reserve" Icon="@Icons.Material.Filled.BookmarkAdd" Color="Color.Default" />
                         <MudIconButton Icon="@Icons.Material.Filled.Share" Color="Color.Default" />
                     </MudCardActions>
                 </MudCard>
@@ -85,6 +93,7 @@
             <MudItem xs="12">
                 <MudPaper>
                     <MudText Typo="Typo.h5">Availability</MudText>
+                    <MudButton OnClick="UpdateAvailability">Update Availability</MudButton>
                     <MudDivider class="my-2" />
                     <MudText><strong>Available for Sale:</strong> @(book.isAvailableForSale ? "Yes" : "No")</MudText>
                     <MudText><strong>Available for Borrow:</strong> @(book.isAvailableForBorrow ? "Yes" : "No")</MudText>
@@ -100,14 +109,6 @@
                     <MudText><strong>Author:</strong> @book.AuthorName</MudText>
                     <MudText><strong>Publisher:</strong> @book.Publisher.Name</MudText>
                     <MudText><strong>Category:</strong> @book.Category.Name</MudText>
-                </MudPaper>
-            </MudItem>
-
-            <MudItem xs="12">
-                <MudPaper>
-                    <MudText Typo="Typo.h5">Description</MudText>
-                    <MudDivider class="my-2" />
-                    <MudText>@book.Description</MudText>
                 </MudPaper>
             </MudItem>
 
@@ -145,5 +146,39 @@
         // StateHasChanged();
         // Fetch book details by Id from API
         // Example: book = await HttpClient.GetFromJsonAsync<Book>($"api/books/{Id}");
+    }
+
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = new();
+
+    void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    void Cancel() => MudDialog.Cancel();
+
+    private void UpdateAvailability()
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var parameters = new DialogParameters<UpdateBookAvailability>();
+        parameters.Add(x => x.book, book);
+        DialogService.Show<UpdateBookAvailability>("Update Book Availability", parameters, options);
+    }
+
+    private async void Reserve()
+    {
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var uid = await _localStorage.GetItemAsync<string>("__id");
+        var customAuthenticationStateProvider = (CustomAuthenticationStateProvider)authenticationStateProvider;
+        var userSession = await customAuthenticationStateProvider.GetAuthenticatedUser();
+
+        BookReservation bookReservation = new BookReservation();
+        bookReservation.BookId = book.Id;
+        bookReservation.UserId = uid!;
+        bookReservation.ReservationDate = DateTime.Today;
+        bookReservation.ExpiryDate = DateTime.Today.AddDays(7);
+        bookReservation.IsActive = true;
+        var res = await _bookService.ReserveBook(bookReservation);
+        if (res.StatusCode == 200)
+        {
+            NavigationManager.NavigateTo("/books");
+        }
+        // DialogService.Show<AddReservation>("Reserve Book");
     }
 }

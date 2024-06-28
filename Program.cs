@@ -15,6 +15,7 @@ using ZNSTLibrary.Services.Books;
 using ZNSTLibrary.Services.Categories;
 using ZNSTLibrary.Services.Publishers;
 using ZNSTLibrary.Services.Authors;
+using ZNSTLibrary.Services.Rentals;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -52,6 +53,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthorService, AuthorService>();
 builder.Services.AddScoped<IBooksService, BooksService>();
 builder.Services.AddScoped<IPublisherService, PublisherService>();
+builder.Services.AddScoped<IBookRental, BookRental>();
 builder.Services.AddScoped<ICategoriesService, CategoriesService>();
 builder.Services.AddTransient<IEmailService, EmailService>();
 var app = builder.Build();

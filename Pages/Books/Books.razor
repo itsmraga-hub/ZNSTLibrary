@@ -93,9 +93,6 @@ else
 
     void OpenCoursePage(TableRowClickEventArgs<Book> tableRowClickEventArgs)
     {
-        Console.WriteLine(tableRowClickEventArgs.Item.Id);
-        Console.WriteLine("William");
         NavigationManager.NavigateTo($"/book-details/{tableRowClickEventArgs.Item.Id}");
-        // NavigationManager.NavigateTo($"/book-details/{book.Id}");
     }
 }

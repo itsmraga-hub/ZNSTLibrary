@@ -64,6 +64,25 @@ namespace ZNSTLibrary.Services.Books
             return await _context.Books.Include(_ => _.Author).ToListAsync();
         }
 
+        public async Task<CustomResponse> ReserveBook(BookReservation bookReservation)
+        {
+            if (_context.BookReservations == null)
+            {
+                return await Task.FromResult(new CustomResponse("Book reservation cannot be null", 500));
+            }
+            var book = await _context.Books.FindAsync(bookReservation.BookId);
+            if (book == null)
+            {
+                return await Task.FromResult(new CustomResponse("Book not found", 500));
+            }
+            book.NumberOfReservedCopies += 1;
+            _context.Books.Update(book);
+            _context.BookReservations.Add(bookReservation);
+            await _context.SaveChangesAsync();
+
+            return await Task.FromResult(new CustomResponse(bookReservation.Id, "Book reserved successfully", 200));
+        }
+
         public async Task<CustomResponse> UpdateBook(string id, Book book)
         {
             if (id != book.Id)
