@@ -2,7 +2,7 @@
 
 namespace ZNSTLibrary.Services.Rentals
 {
-    public interface IBookRental
+    public interface IBookRentalService
     {
         Task<CustomResponse> CreateBookRental(BookRental rental);
 

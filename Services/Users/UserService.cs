@@ -75,34 +75,44 @@ namespace ZNSTLibrary.Data.Services.Users
             return Task.FromResult(userSession);
         }
 
-/*                public Task<UserSession> CreateUserAsync(User user)
-                {
-                    Console.WriteLine("Sending email");
-                    string to = "itsmraga@gmail.com"; //To address    
-                    string from = "ragawilliam570@gmail.com"; //From address    
-                    MailMessage message = new MailMessage(from, to);
+        public Task<User> GetUser(string id)
+        {
+            throw new NotImplementedException();
+        }
 
-                    string mailbody = "In this article you will learn how to send a email using Asp.Net & C#";
-                    message.Subject = "Sending Email Using Asp.Net & C#";
-                    message.Body = mailbody;
-                    message.BodyEncoding = Encoding.UTF8;
-                    message.IsBodyHtml = true;
-                    SmtpClient client = new SmtpClient("smtp.gmail.com", 587); //Gmail smtp    
-                    NetworkCredential basicCredential1 = new
-                    NetworkCredential("ragawilliam570", "fkgr xybj jogc hicl");
-                    client.EnableSsl = true;
-                    client.UseDefaultCredentials = false;
-                    client.Credentials = basicCredential1;
-                    try
-                    {
-                        client.Send(message);
-                    }
+        public Task<List<User>> GetUsers()
+        {
+            throw new NotImplementedException();
+        }
 
-                    catch (Exception ex)
-                    {
-                        throw ex;
-                    }
-                    throw new NotImplementedException();
-                }*/
+        /*                public Task<UserSession> CreateUserAsync(User user)
+                        {
+                            Console.WriteLine("Sending email");
+                            string to = "itsmraga@gmail.com"; //To address    
+                            string from = "ragawilliam570@gmail.com"; //From address    
+                            MailMessage message = new MailMessage(from, to);
+
+                            string mailbody = "In this article you will learn how to send a email using Asp.Net & C#";
+                            message.Subject = "Sending Email Using Asp.Net & C#";
+                            message.Body = mailbody;
+                            message.BodyEncoding = Encoding.UTF8;
+                            message.IsBodyHtml = true;
+                            SmtpClient client = new SmtpClient("smtp.gmail.com", 587); //Gmail smtp    
+                            NetworkCredential basicCredential1 = new
+                            NetworkCredential("ragawilliam570", "fkgr xybj jogc hicl");
+                            client.EnableSsl = true;
+                            client.UseDefaultCredentials = false;
+                            client.Credentials = basicCredential1;
+                            try
+                            {
+                                client.Send(message);
+                            }
+
+                            catch (Exception ex)
+                            {
+                                throw ex;
+                            }
+                            throw new NotImplementedException();
+                        }*/
     }
 }

@@ -53,7 +53,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthorService, AuthorService>();
 builder.Services.AddScoped<IBooksService, BooksService>();
 builder.Services.AddScoped<IPublisherService, PublisherService>();
-builder.Services.AddScoped<IBookRental, Rental>();
+builder.Services.AddScoped<IBookRentalService, BookRentalService>();
 builder.Services.AddScoped<ICategoriesService, CategoriesService>();
 builder.Services.AddTransient<IEmailService, EmailService>();
 var app = builder.Build();

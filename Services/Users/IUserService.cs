@@ -7,5 +7,9 @@ namespace ZNSTLibrary.Data.Services.Users
     {
         Task<UserSession> CreateUserAsync(User user);
         Task<UserSession> AuthenticateUser(string email, string password);
+
+        Task<User> GetUser(string id);
+
+        Task<List<User>> GetUsers();
     }
 }

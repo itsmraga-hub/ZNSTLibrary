@@ -5,11 +5,11 @@ using ZNSTLibrary.Pages.Books;
 
 namespace ZNSTLibrary.Services.Rentals
 {
-    public class Rental : IBookRental
+    public class BookRentalService : IBookRentalService
     {
         private readonly ZNSTLibraryContext _context;
 
-        public Rental(ZNSTLibraryContext context)
+        public BookRentalService(ZNSTLibraryContext context)
         {
             _context = context;
         }

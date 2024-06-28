@@ -2,31 +2,69 @@
 @using MudBlazor
 @using MudBlazor.Components
 @using ZNSTLibrary.Data.Models
+@using ZNSTLibrary.Data.Services.Users
+@using ZNSTLibrary.Services.Books
+@using ZNSTLibrary.Services.Rentals
 @inject HttpClient HttpClient
 @inject NavigationManager NavigationManager
+@inject IBookRentalService _bookRentalService
+@inject IBooksService booksService
+@inject IUserService usersService
 
-<MudPaper Class="p-4">
-    <MudText Typo="Typo.h5">Create Book Rental</MudText>
-    <EditForm Model="@bookRental" OnValidSubmit="HandleValidSubmit">
-        <DataAnnotationsValidator />
-        <MudTextField Label="Book ID" @bind-Value="bookRental.BookId" Required="true" />
-        <MudTextField Label="User ID" @bind-Value="bookRental.UserId" Required="true" />
-        <MudDatePicker Label="Rental Date" @bind-Value="bookRental.RentalDate" Required="true" />
-        <MudDatePicker Label="Return Date" @bind-Value="bookRental.ReturnDate" Required="true" />
-        <MudSwitch Label="Is Returned" @bind-Value="bookRental.IsReturned" />
+<MudDialog>
+    <DialogContent>
+        <MudPaper Class="p-4">
+            <MudText Typo="Typo.h5">Create Book Rental</MudText>
+            <EditForm Model="@bookRental" OnValidSubmit="HandleValidSubmit">
+                <DataAnnotationsValidator />
+                <MudTextField Label="Book ID" @bind-Value="bookRental.BookId" Required="true" />
+                <MudTextField Label="User ID" @bind-Value="bookRental.UserId" Required="true" />
+                <MudDatePicker Label="Rental Date" @bind-Value="bookRental.RentalDate" Required="true" />
+                <MudDatePicker Label="Return Date" @bind-Value="bookRental.ReturnDate" Required="true" />
+                <MudSwitch Label="Is Returned" @bind-Value="bookRental.IsReturned" />
 
-        <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled">Create Rental</MudButton>
-    </EditForm>
-</MudPaper>
+                <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled">Create Rental</MudButton>
+            </EditForm>
+        </MudPaper>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
 
 @code {
     private BookRental bookRental = new BookRental();
     private MudForm form = new MudForm();
+    private List<Book> books = new List<Book>();
+    private List<User> users = new List<User>();
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        var res = await booksService.GetBooks();
+        var res2 = await usersService.GetUsers();
+
+        if (res != null)
+        {
+            books = res;
+            users = res2;
+        }
+    }
+
 
     private async Task HandleValidSubmit()
     {
-        // API call to create book rental
-        // await HttpClient.PostAsJsonAsync("api/bookRentals", bookRental);
-        NavigationManager.NavigateTo("/book-rentals");
+        var res = await _bookRentalService.CreateBookRental(bookRental);
+        if (res.StatusCode == 200)
+        {
+            // API call to create book rental
+            // await HttpClient.PostAsJsonAsync("api/bookRentals", bookRental);
+            NavigationManager.NavigateTo("/book-rentals");
+        }
     }
+
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = new();
+
+    void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    void Cancel() => MudDialog.Cancel();
 }
