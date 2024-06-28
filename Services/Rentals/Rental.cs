@@ -63,9 +63,40 @@ namespace ZNSTLibrary.Services.Rentals
             return await _context.BookRentals.Include(_ => _.Book).ToListAsync();
         }
 
-        public Task<CustomResponse> UpdateBookRental(string id, BookRental rental)
+        public async Task<CustomResponse> UpdateBookRental(string id, BookRental rental)
         {
-            throw new NotImplementedException();
+            if (id != rental.Id)
+            {
+                return await Task.FromResult(new CustomResponse("Rental id does bot match", 500));
+            }
+            if (rental == null)
+            {
+                return await Task.FromResult(new CustomResponse("Rental cannot be null", 500));
+            }
+            // _context.Books.Update(book);
+            _context.Entry(rental).State = EntityState.Modified;
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!BookRentalExists(id))
+                {
+                    return await Task.FromResult(new CustomResponse("Rental cannot be null", 500));
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            // await _context.SaveChangesAsync(true);
+            return await Task.FromResult(new CustomResponse(rental.Id, "Book updated successfully", 200));
+        }
+
+        private bool BookRentalExists(string id)
+        {
+            return (_context.BookRentals?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }
