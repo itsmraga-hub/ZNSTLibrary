@@ -10,6 +10,6 @@ namespace ZNSTLibrary.Data.Services.Users
 
         Task<User> GetUser(string id);
 
-        Task<List<User>> GetUsers();
+        Task<List<User>> GetUsers(string role);
     }
 }

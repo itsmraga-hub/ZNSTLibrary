@@ -1,0 +1,77 @@
+﻿@page "/admins"
+@using MudBlazor
+@using MudBlazor.Components
+@using ZNSTLibrary.Data.Models
+@using ZNSTLibrary.Data.Services.Users
+@using ZNSTLibrary.Services.Books
+@using ZNSTLibrary.Services.Rentals
+@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+@inject IBookRentalService _bookRentalService
+@inject IBooksService booksService
+@inject IUserService usersService
+@inject IDialogService DialogService
+
+@if (users == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+    {
+    <MudButton @onclick="openAddUserModal" Variant="Variant.Filled" Color="Color.Primary">
+        Add User
+    </MudButton>
+    <MudTable Items="@users" T="User" @bind-SelectedItem="selectedUser">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Book Rentals</MudText>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh></MudTh>
+            <MudTh>Role</MudTh>
+            <MudTh>Email</MudTh>
+            <MudTh>UserName</MudTh>
+            <MudTh>PhoneNumber</MudTh>
+            <MudTh>Is Returned</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Return Date">@context.ProfilePictureUrl</MudTd>
+            <MudTd DataLabel="Book ID">@context.Role</MudTd>
+            <MudTd DataLabel="User ID">@context.Email</MudTd>
+            <MudTd DataLabel="Rental Date">@context.UserName</MudTd>
+            <MudTd DataLabel="Return Date">@context.PhoneNumber</MudTd>
+
+            @* <MudTd DataLabel="Is Returned">@context.IsReturned ? "Yes" : "No"</MudTd> *@
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[] { 10, 25, 50, 100 }" />
+        </PagerContent>
+    </MudTable>
+    }
+
+@code {
+    private List<User> users = new List<User>();
+    private User selectedUser = new User();
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        var res = await usersService.GetUsers("Administrator");
+
+        if (res != null)
+        {
+            users = res;
+        }
+    }
+
+    void OpenUserPage(TableRowClickEventArgs<Book> tableRowClickEventArgs)
+    {
+        NavigationManager.NavigateTo($"/user-details/{tableRowClickEventArgs.Item.Id}");
+    }
+
+    void openAddUserModal()
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        DialogService.Show<AddMember>("Add User", options);
+    }
+
+}

@@ -23,7 +23,7 @@
                         <MudSelectItem T="string" Value="@book.Id">@book.Title</MudSelectItem>
                     }
                 </MudSelect>
-                <MudSelect T="string" Required="true" HelperText="@value" @bind-Value="bookRental.BookId" Variant="Variant.Outlined" Label="Select Member" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown">
+                <MudSelect T="string" Required="true" HelperText="@value" @bind-Value="bookRental.UserId" Variant="Variant.Outlined" Label="Select Member" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown">
                     @foreach (var user in users)
                     {
                         <MudSelectItem T="string" Value="@user.Id">@user.FirstName @user.LastName</MudSelectItem>
@@ -31,7 +31,7 @@
                 </MudSelect>
                 <MudDatePicker Label="Rental Date" @bind-Value="bookRental.RentalDate" Required="true" />
                 <MudDatePicker Label="Return Date" @bind-Value="bookRental.ReturnDate" Required="true" />
-                <MudSwitch Label="Is Returned" @bind-Value="bookRental.IsReturned" />
+                <MudSwitch Label="Is Returned" @bind-Value="bookRental.IsReturned" Color="Color.Success" />
 
                 <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled">Create Rental</MudButton>
             </EditForm>
@@ -54,7 +54,7 @@
     {
 
         var res = await booksService.GetBooks();
-        var res2 = await usersService.GetUsers();
+        var res2 = await usersService.GetUsers("Member");
 
         if (res != null)
         {

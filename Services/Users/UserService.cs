@@ -8,6 +8,7 @@ using System.Net;
 using System.Text;
 using ZNSTLibrary.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace ZNSTLibrary.Data.Services.Users
 {
@@ -76,18 +77,22 @@ namespace ZNSTLibrary.Data.Services.Users
             return Task.FromResult(userSession);
         }
 
-        public Task<User> GetUser(string id)
+        public async Task<User> GetUser(string id)
         {
-            throw new NotImplementedException();
+            if (_context.Users == null)
+            {
+                return new User();
+            }
+            return await _context.Users.Where(_ => _.Id == id).FirstOrDefaultAsync();
         }
 
-        public async Task<List<User>> GetUsers()
+        public async Task<List<User>> GetUsers(string role)
         {
             if (_context.Users == null)
             {
                 return new List<User>();
             }
-            return await _context.Users.Where(_ => _.Role == "Member").ToListAsync();
+            return await _context.Users.Where(_ => _.Role == role).ToListAsync();
         }
 
         /*                public Task<UserSession> CreateUserAsync(User user)
