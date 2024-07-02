@@ -33,11 +33,11 @@ else
             <MudTh>Is Returned</MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Book ID">@context.BookId</MudTd>
-            <MudTd DataLabel="User ID">@context.UserId</MudTd>
-            <MudTd DataLabel="Rental Date">@context.RentalDate.ToShortDateString()</MudTd>
-            <MudTd DataLabel="Return Date">@context.ReturnDate.ToShortDateString()</MudTd>
-            @* <MudTd DataLabel="Is Returned">@context.IsReturned ? "Yes" : "No"</MudTd> *@
+            <MudTd DataLabel="Book ID">@context.Book.Title</MudTd>
+            <MudTd DataLabel="User ID">@context.User.UserName</MudTd>
+            <MudTd DataLabel="Rental Date">@context.RentalDate</MudTd>
+            <MudTd DataLabel="Return Date">@context.ReturnDate</MudTd>
+            <MudTd DataLabel="Is Returned">@context.IsReturned ? "Yes" : "No"</MudTd>
         </RowTemplate>
         <PagerContent>
             <MudTablePager PageSizeOptions="new int[] { 10, 25, 50, 100 }" />

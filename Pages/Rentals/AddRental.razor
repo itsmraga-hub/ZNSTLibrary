@@ -29,8 +29,8 @@
                         <MudSelectItem T="string" Value="@user.Id">@user.FirstName @user.LastName</MudSelectItem>
                     }
                 </MudSelect>
-                <MudDatePicker Label="Rental Date" @bind-Value="bookRental.RentalDate" Required="true" />
-                <MudDatePicker Label="Return Date" @bind-Value="bookRental.ReturnDate" Required="true" />
+                <MudDatePicker Label="Rental Date" @bind-Value="rentalDate" Required="true" />
+                <MudDatePicker Label="Return Date" @bind-Value="returnDate" Required="true" />
                 <MudSwitch Label="Is Returned" @bind-Value="bookRental.IsReturned" Color="Color.Success" />
 
                 <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled">Create Rental</MudButton>
@@ -47,6 +47,9 @@
     private MudForm form = new MudForm();
     private List<Book> books = new List<Book>();
     private List<User> users = new List<User>();
+
+    private DateTime rentalDate = DateTime.Now;
+    private DateTime returnDate = DateTime.Now;
 
     private string value = "Select a book";
 
@@ -66,6 +69,8 @@
 
     private async Task HandleValidSubmit()
     {
+        bookRental.RentalDate = rentalDate;
+        bookRental.ReturnDate = returnDate;
         var res = await _bookRentalService.CreateBookRental(bookRental);
         if (res.StatusCode == 200)
         {

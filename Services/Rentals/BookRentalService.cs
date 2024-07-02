@@ -60,7 +60,7 @@ namespace ZNSTLibrary.Services.Rentals
             {
                 return new List<BookRental>();
             }
-            return await _context.BookRentals.Include(_ => _.Book).ToListAsync();
+            return await _context.BookRentals.Include(_ => _.Book).Include(_ => _.User).ToListAsync();
         }
 
         public async Task<CustomResponse> UpdateBookRental(string id, BookRental rental)
