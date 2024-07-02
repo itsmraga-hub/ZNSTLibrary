@@ -23,7 +23,7 @@ else
     </MudButton>
     <MudTable Items="@users" T="User" @bind-SelectedItem="selectedUser">
         <ToolBarContent>
-            <MudText Typo="Typo.h6">Book Rentals</MudText>
+            <MudText Typo="Typo.h6">Staff</MudText>
         </ToolBarContent>
         <HeaderContent>
             <MudTh></MudTh>
@@ -39,6 +39,11 @@ else
             <MudTd DataLabel="User ID">@context.Email</MudTd>
             <MudTd DataLabel="Rental Date">@context.UserName</MudTd>
             <MudTd DataLabel="Return Date">@context.PhoneNumber</MudTd>
+            <MudTd DataLabel="Return Date">
+                <MudButton OnClick="() => MakeUserAdmin(context)">
+                    Make Admin
+                </MudButton>
+            </MudTd>
 
             @* <MudTd DataLabel="Is Returned">@context.IsReturned ? "Yes" : "No"</MudTd> *@
         </RowTemplate>
@@ -63,9 +68,16 @@ else
         }
     }
 
-    void OpenUserPage(TableRowClickEventArgs<Book> tableRowClickEventArgs)
+    void OpenUserPage(TableRowClickEventArgs<User> tableRowClickEventArgs)
     {
         NavigationManager.NavigateTo($"/user-details/{tableRowClickEventArgs.Item.Id}");
+    }
+
+    void MakeUserAdmin(User user)
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        // var parameters = new Dia
+        DialogService.Show<AddMember>("Add User", options);
     }
 
     void openAddUserModal()
