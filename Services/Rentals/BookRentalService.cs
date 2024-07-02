@@ -54,6 +54,16 @@ namespace ZNSTLibrary.Services.Rentals
             return await Task.FromResult(rental!);
         }
 
+        public async Task<List<BookReservation>> GetUserBooksReserved(string userId)
+        {
+            if (_context.BookReservations == null)
+            {
+                return new List<BookReservation>();
+            }
+            var books = await _context.BookReservations.Include(_ => _.Book).Where(_ => _.UserId == userId).ToListAsync();
+            return books;
+        }
+
         public async Task<List<BookRental>> GetBookRentals()
         {
             if (_context.BookRentals == null)

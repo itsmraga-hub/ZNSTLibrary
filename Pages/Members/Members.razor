@@ -31,7 +31,7 @@ else
             <MudTh>Email</MudTh>
             <MudTh>UserName</MudTh>
             <MudTh>PhoneNumber</MudTh>
-            <MudTh>Is Returned</MudTh>
+            <MudTh>Books Borrowed</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Return Date">@context.ProfilePictureUrl</MudTd>
@@ -56,6 +56,7 @@ else
     {
 
         var res = await usersService.GetUsers("Member");
+        // var res2 = await booksService.Get
 
         if (res != null)
         {
