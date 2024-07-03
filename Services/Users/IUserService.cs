@@ -9,6 +9,7 @@ namespace ZNSTLibrary.Data.Services.Users
         Task<UserSession> AuthenticateUser(string email, string password);
 
         Task<User> GetUser(string id);
+        Task<List<User>> GetUsers();
 
         Task MakeAdmin(string id);
 

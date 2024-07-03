@@ -88,7 +88,7 @@ namespace ZNSTLibrary.Services.Books
             if (id != book.Id)
             {
                 return await Task.FromResult(new CustomResponse("Book id does bot match", 500));
-            }            
+            }
             if (book == null)
             {
                 return await Task.FromResult(new CustomResponse("Book cannot be null", 500));

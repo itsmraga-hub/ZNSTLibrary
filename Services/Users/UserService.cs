@@ -24,7 +24,7 @@ namespace ZNSTLibrary.Data.Services.Users
             _context = context;
             _logger = logger;
             _passwordHasher = passwordHasher;
-        }  
+        }
 
         public Task<UserSession> CreateUserAsync(User user)
         {
@@ -97,6 +97,7 @@ namespace ZNSTLibrary.Data.Services.Users
             return await _context.Users.Where(_ => _.Role == role).ToListAsync();
         }
 
+
         public async Task MakeAdmin(string id)
         {
             if (_context.Users == null)
@@ -125,7 +126,7 @@ namespace ZNSTLibrary.Data.Services.Users
             {
                 return;
             }
-            user.Role = "Admin";
+            user.Role = "Member";
             _context.Entry(user).State = EntityState.Modified;
             await _context.SaveChangesAsync();
             return;
@@ -133,19 +134,32 @@ namespace ZNSTLibrary.Data.Services.Users
 
         public async Task MakeStaff(string id)
         {
+            Console.WriteLine("William");
             if (_context.Users == null)
             {
                 return;
             }
             var user = await _context.Users.Where(_ => _.Id == id).FirstOrDefaultAsync();
+            Console.WriteLine(user);
             if (user == null)
             {
                 return;
             }
-            user.Role = "Admin";
+            user.Role = "Staff";
             _context.Entry(user).State = EntityState.Modified;
             await _context.SaveChangesAsync();
             return;
+        }
+
+        public async Task<List<User>> GetUsers()
+        {
+            if (_context.Users == null)
+            {
+                return new List<User>();
+            }
+            return await _context.Users.ToListAsync();
+
+
         }
 
         /*                public Task<UserSession> CreateUserAsync(User user)
