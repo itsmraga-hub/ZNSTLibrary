@@ -1,4 +1,4 @@
-﻿@page "/all-users"
+﻿@page "/all-system-users"
 @using MudBlazor
 @using MudBlazor.Components
 @using ZNSTLibrary.Data.Models
@@ -70,6 +70,21 @@ else
     {
         var options = new DialogOptions { CloseOnEscapeKey = true };
         DialogService.Show<AddMember>("Add User", options);
+    }
+
+    void makeAdmin()
+    {
+        var res = usersService.MakeAdmin(selectedUser.Id);
+    }
+
+    void makeMember()
+    {
+        var res = usersService.MakeUser(selectedUser.Id);
+    }
+
+    void makeStaff()
+    {
+        var res = usersService.MakeStaff(selectedUser.Id);
     }
 
 }
