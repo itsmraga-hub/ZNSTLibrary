@@ -9,6 +9,7 @@ using System.Text;
 using ZNSTLibrary.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using ZNSTLibrary.Pages.Books;
 
 namespace ZNSTLibrary.Data.Services.Users
 {
@@ -83,7 +84,8 @@ namespace ZNSTLibrary.Data.Services.Users
             {
                 return new User();
             }
-            return await _context.Users.Where(_ => _.Id == id).FirstOrDefaultAsync();
+            var user = await _context.Users.Where(_ => _.Id == id).FirstOrDefaultAsync();
+            return user!;
         }
 
         public async Task<List<User>> GetUsers(string role)
@@ -93,6 +95,57 @@ namespace ZNSTLibrary.Data.Services.Users
                 return new List<User>();
             }
             return await _context.Users.Where(_ => _.Role == role).ToListAsync();
+        }
+
+        public async Task MakeAdmin(string id)
+        {
+            if (_context.Users == null)
+            {
+                return;
+            }
+            var user = await _context.Users.Where(_ => _.Id == id).FirstOrDefaultAsync();
+            if (user == null)
+            {
+                return;
+            }
+            user.Role = "Administrator";
+            _context.Entry(user).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return;
+        }
+
+        public async Task MakeUser(string id)
+        {
+            if (_context.Users == null)
+            {
+                return;
+            }
+            var user = await _context.Users.Where(_ => _.Id == id).FirstOrDefaultAsync();
+            if (user == null)
+            {
+                return;
+            }
+            user.Role = "Admin";
+            _context.Entry(user).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return;
+        }
+
+        public async Task MakeStaff(string id)
+        {
+            if (_context.Users == null)
+            {
+                return;
+            }
+            var user = await _context.Users.Where(_ => _.Id == id).FirstOrDefaultAsync();
+            if (user == null)
+            {
+                return;
+            }
+            user.Role = "Admin";
+            _context.Entry(user).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return;
         }
 
         /*                public Task<UserSession> CreateUserAsync(User user)

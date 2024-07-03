@@ -35,8 +35,8 @@ else
         <RowTemplate>
             <MudTd DataLabel="Book ID">@context.Book.Title</MudTd>
             <MudTd DataLabel="User ID">@context.User.UserName</MudTd>
-            <MudTd DataLabel="Rental Date">@context.RentalDate</MudTd>
-            <MudTd DataLabel="Return Date">@context.ReturnDate</MudTd>
+            <MudTd DataLabel="Rental Date">@context.RentalDate.ToShortDateString()</MudTd>
+            <MudTd DataLabel="Return Date">@context.ReturnDate.ToShortDateString()</MudTd>
             <MudTd DataLabel="Is Returned">@context.IsReturned ? "Yes" : "No"</MudTd>
         </RowTemplate>
         <PagerContent>

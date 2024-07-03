@@ -50,13 +50,12 @@ else
 
 @code {
     private List<User> users = new List<User>();
+    private List<Book> books = new List<Book>();
     private User selectedUser = new User();
 
     protected override async Task OnInitializedAsync()
     {
-
         var res = await usersService.GetUsers("Member");
-        // var res2 = await booksService.Get
 
         if (res != null)
         {
