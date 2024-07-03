@@ -31,7 +31,7 @@ else
             <MudTh>Email</MudTh>
             <MudTh>UserName</MudTh>
             <MudTh>PhoneNumber</MudTh>
-            <MudTh>Is Returned</MudTh>
+            <MudTh>UpdateRole</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Return Date">@context.ProfilePictureUrl</MudTd>
@@ -39,6 +39,20 @@ else
             <MudTd DataLabel="User ID">@context.Email</MudTd>
             <MudTd DataLabel="UserName">@context.UserName</MudTd>
             <MudTd DataLabel="Phone Number">@context.PhoneNumber</MudTd>
+            <MudTd>
+                @if(@context.Role == "Member")
+                {
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="() => makeStaff(context.Id)">Make Staff</MudButton>
+                }
+                else if(@context.Role == "Admin")
+                {
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="() => makeAdmin(context.Id)">Make Admin</MudButton>
+                }
+                else if(@context.Role == "Staff")
+                {
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="() => makeAdmin(context.Id)">Make Admin</MudButton>
+                }
+            </MudTd>
         </RowTemplate>
         <PagerContent>
             <MudTablePager PageSizeOptions="new int[] { 10, 25, 50, 100 }" />
@@ -72,17 +86,17 @@ else
         DialogService.Show<AddMember>("Add User", options);
     }
 
-    void makeAdmin()
+    void makeAdmin(string id)
     {
         var res = usersService.MakeAdmin(selectedUser.Id);
     }
 
-    void makeMember()
+    void makeMember(string id)
     {
         var res = usersService.MakeUser(selectedUser.Id);
     }
 
-    void makeStaff()
+    void makeStaff(string id)
     {
         var res = usersService.MakeStaff(selectedUser.Id);
     }
