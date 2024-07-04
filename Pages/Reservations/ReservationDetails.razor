@@ -1,0 +1,33 @@
+﻿@page "/book-reservation-details/{Id}"
+@using MudBlazor
+@using MudBlazor.Components
+@using ZNSTLibrary.Data.Models
+@inject HttpClient HttpClient
+
+<MudPaper Class="p-4">
+    @if (reservation == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <MudText Typo="Typo.h5">Reservation Details</MudText>
+        <MudText><strong>Book ID:</strong> @reservation.BookId</MudText>
+        <MudText><strong>User ID:</strong> @reservation.UserId</MudText>
+        <MudText><strong>Reservation Date:</strong> @reservation.ReservationDate.ToShortDateString()</MudText>
+        <MudText><strong>Expiry Date:</strong> @reservation.ExpiryDate.ToShortDateString()</MudText>
+        <MudText><strong>Is Active:</strong> @(reservation.IsActive ? "Yes" : "No")</MudText>
+    }
+</MudPaper>
+
+@code {
+    [Parameter]
+    public string Id { get; set; } = "";
+    private BookReservation reservation = new BookReservation();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Fetch reservation details by Id from API
+        // reservation = await HttpClient.GetFromJsonAsync<BookReservation>($"api/bookReservations/{Id}");
+    }
+}

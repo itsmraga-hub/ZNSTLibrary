@@ -1,0 +1,191 @@
+﻿@using System.ComponentModel.DataAnnotations
+@using ZNSTLibrary.Data.Models
+@using ZNSTLibrary.Data.Services.Users
+@using ZNSTLibrary.Services.EmailService
+@using ZNSTLibrary.Services.Users
+
+@inject NavigationManager NavigationManager
+@inject IUserService _userService
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject IJSRuntime JSRuntime
+@inject ISnackbar Snackbar
+@inject ILocalStorageService LocalStorage
+@inject IEmailService _emailService
+
+
+<MudDialog>
+    <DialogContent>
+        <MudGrid>
+            <MudItem>
+                <MudText Typo="Typo.h4"><MudNavLink Href="/" Match="NavLinkMatch.Prefix">Codesome</MudNavLink></MudText>
+                <MudText Typo="Typo.h4">Registration</MudText>
+            </MudItem>
+        </MudGrid>
+        <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+            <DataAnnotationsValidator />
+            <MudGrid>
+                <MudItem xs="12" sm="12">
+                    <MudCard>
+                        <MudCardContent>
+                            <MudGrid>
+                                <MudItem xs="12" sm="4">
+                                    <MudTextField Label="First name" HelperText="Max. 8 characters"
+                                                  @bind-Value="model.FirstName" For="@(() => model.FirstName)" />
+                                </MudItem>
+                                <MudItem xs="12" sm="4">
+                                    <MudTextField Label="Last name" HelperText="Max. 8 characters"
+                                                  @bind-Value="model.LastName" For="@(() => model.LastName)" />
+                                </MudItem>
+                                <MudItem xs="12" sm="4">
+                                    <MudTextField Label="User name" HelperText="Max. 8 characters"
+                                                  @bind-Value="model.Username" For="@(() => model.Username)" />
+                                </MudItem>
+                                <MudItem xs="12" sm="4">
+                                    <MudTextField Label="Phone Number" HelperText="Max. 8 characters"
+                                                  @bind-Value="model.PhoneNumber" For="@(() => model.PhoneNumber)" />
+                                </MudItem>
+                                <MudItem xs="12" sm="4">
+                                    <MudSelect Margin="Margin.Dense" T="string" Label="Role" Variant="Variant.Outlined" @bind-Value="model.Role" For="@(() => model.Role)">
+                                        <MudSelectItem Value="@("Member")" />
+                                        <MudSelectItem Value="@("Staff")" />
+                                        <MudSelectItem Value="@("Administrator")" />
+                                    </MudSelect>
+                                </MudItem>
+                                <MudItem xs="12" sm="4">
+                                    <MudDatePicker Label="Date of Birth"
+                                                   DateFormat="dd-MM-yyyy"
+                                                   IsDateDisabledFunc="@((DateTime dt)=>((int)dt.Year > DateTime.Now.Year - 4))" />
+                                </MudItem>
+                                <MudItem xs="12" sm="4">
+                                    <MudTextField Label="Email" Class="mt-3"
+                                                  @bind-Value="model.Email" For="@(() => model.Email)" />
+                                </MudItem>
+                                <MudItem xs="12" sm="4">
+                                    <MudTextField Label="Password" HelperText="Choose a strong password" Class="mt-3"
+                                                  @bind-Value="model.Password" For="@(() => model.Password)" InputType="InputType.Password" />
+                                </MudItem>
+                                <MudItem xs="12" sm="4">
+                                    <MudTextField Label="Confirmation Password" HelperText="Confirm password" Class="mt-3"
+                                                  @bind-Value="model.Password2" For="@(() => model.Password2)" InputType="InputType.Password" />
+                                </MudItem>
+                            </MudGrid>
+                        </MudCardContent>
+                        <MudCardActions>
+                            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Register</MudButton>
+                        </MudCardActions>
+                    </MudCard>
+                </MudItem>
+            </MudGrid>
+        </EditForm>
+
+    </DialogContent>
+</MudDialog>
+
+@code {
+    RegisterAccountForm model = new RegisterAccountForm();
+
+    public class RegisterAccountForm
+    {
+        [Required]
+        [StringLength(8, ErrorMessage = "Name length can't be more than 8.")]
+        public string FirstName { get; set; } = "";
+
+        [Required]
+        [StringLength(8, ErrorMessage = "Name length can't be more than 8.")]
+        public string LastName { get; set; } = "";
+
+        [Required]
+        [StringLength(8, ErrorMessage = "Name length can't be more than 8.")]
+        public string Username { get; set; } = "";
+
+        [Required]
+        [StringLength(12, ErrorMessage = "Phone length can't be more than 12.")]
+        public string PhoneNumber { get; set; } = "";
+
+        [Required]
+        public DateTime DateOfBirth { get; set; }
+        public int Age { get; set; }
+
+        [Required]
+        [StringLength(20, ErrorMessage = "Role is Required")]
+        public string Role { get; set; } = "Default";
+
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; } = "";
+
+        [Required]
+        [StringLength(30, ErrorMessage = "Password must be at least 8 characters long.", MinimumLength = 8)]
+        public string Password { get; set; } = "";
+
+        [Required]
+        [Compare(nameof(Password))]
+        public string Password2 { get; set; } = "";
+
+    }
+
+    private async void OnValidSubmit(EditContext context)
+    {
+        User user = new User
+            {
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                Email = model.Email
+            };
+        user.PhoneNumber = model.PhoneNumber;
+        user.PhoneNumberConfirmed = true;
+        user.UserName = model.Username;
+        user.EmailConfirmed = true;
+        user.DateOfBirth = model.DateOfBirth;
+        user.age = DateTime.Now.Year - model.DateOfBirth.Year;
+        user.Role = model.Role;
+        if (model.Password == model.Password2)
+        {
+            user.PasswordHash = model.Password;
+            var res = await _userService.CreateUserAsync(user);
+
+            if (res.IsAuthenticated)
+            {
+               //  await LocalStorage.SetItemAsync("uid", res.Id);
+                // var customAuthenticationStateProvider = (CustomAuthenticationStateProvider)authenticationStateProvider;
+                // await customAuthenticationStateProvider!.UpdateAuthenticationState(res);
+                _emailService.SendMail(new MailData
+                    {
+                        EmailToId = user.Email,
+                        EmailToName = user.FirstName,
+                        EmailSubject = "Welcome " + user.FirstName + " to 963Library",
+                        EmailBody = "Welcome to 963Library. We are glad to have you on board."
+                    });
+                NavigationManager.NavigateTo("/", true);
+                // await LocalStorage.SetItemAsync("uid", res.Id);
+                // await LocalStorage.SetItemAsync("__id", res.Id);
+            }
+        }
+        else
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Passwords do not match");
+        }
+
+    }
+
+    private void OnInvalidSubmit(EditContext context)
+    {
+        // Handle invalid submission
+    }
+
+    private async void SendMail()
+    {
+        User user = new User();
+        user.Email = "itsmraga@gmail.com";
+        user.FirstName = "Raga";
+        _emailService.SendMail(new MailData
+            {
+                EmailToId = user.Email,
+                EmailToName = user.FirstName,
+                EmailSubject = "Welcome " + user.FirstName + " to 963Library",
+                EmailBody = "Welcome to 963Library. We are glad to have you on board."
+            });
+        // var res = await _userService.CreateUserAsync(user);
+    }
+    }
+                                }

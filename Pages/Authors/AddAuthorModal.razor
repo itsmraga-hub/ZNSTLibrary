@@ -1,0 +1,110 @@
+﻿@using Newtonsoft.Json
+@using ZNSTLibrary.Authentication
+@using ZNSTLibrary.Data.Models
+@using ZNSTLibrary.Services.Authors
+@inject IAuthorService _authorService
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject ILocalStorageService _localStorage
+
+<MudDialog>
+    <DialogContent>
+        <EditForm Model="@author" OnValidSubmit="@HandleValidSubmit">
+            <MudCard>
+                <MudCardContent>
+                    <MudGrid>
+                        <MudItem md="4" xs="12">
+                            <MudTextField @bind-Value="author.Name" Label="Name" Required="true" />
+                        </MudItem>
+                        <MudItem md="4" xs="12">
+                            <MudTextField @bind-Value="author.Description" Label="Description" Required="true" />
+                        </MudItem>
+                        <MudItem md="4" xs="12">
+                            <MudTextField @bind-Value="author.PhotoUrl" Label="Photo URL" Required="true" />
+                        </MudItem>
+                        <MudItem md="4" xs="12">
+                            <MudTextField @bind-Value="author.Website" Label="Website" Required="true" />
+                        </MudItem>
+                        <MudItem md="4" xs="12">
+                            <MudTextField @bind-Value="author.Email" Label="Email" Required="true" />
+                        </MudItem>
+                        <MudItem md="4" xs="12">
+                            <MudTextField @bind-Value="author.PhoneNumber" Label="Phone Number" Required="true" />
+                        </MudItem>
+                        <MudItem md="4" xs="12">
+                            <MudTextField @bind-Value="author.Address" Label="Address" Required="true" />
+                        </MudItem>
+                        <MudItem md="4" xs="12">
+                            <MudTextField @bind-Value="author.City" Label="City" Required="true" />
+                        </MudItem>
+                        <MudItem md="4" xs="12">
+                            <MudTextField @bind-Value="author.Country" Label="Country" Required="true" />
+                        </MudItem>
+                        <MudItem md="4" xs="12">
+                            <MudTextField @bind-Value="author.PostalCode" Label="Postal Code" Required="true" />
+                        </MudItem>
+                    </MudGrid>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary">Submit</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton ButtonType="ButtonType.Button" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private Author author = new Author();
+    private bool isCreating = false;
+
+    private async void HandleValidSubmit()
+    {
+        await AddNewAuthor();
+
+        // Handle form submission logic here
+        Console.WriteLine("Form submitted successfully!");
+    }
+
+    private async Task AddNewAuthor()
+    {
+        try
+        {
+            isCreating = true;
+            // Get the current user's ID
+            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+            var uid = await _localStorage.GetItemAsync<string>("__id");
+            var customAuthenticationStateProvider = (CustomAuthenticationStateProvider)authenticationStateProvider;
+            var userSession = await customAuthenticationStateProvider.GetAuthenticatedUser();
+            // Console.WriteLine(JsonConvert.SerializeObject(authState));
+
+            // var user = authState.User;
+            // Console.WriteLine(JsonConvert.SerializeObject(categoriesOptions));
+            author.CreatedBy = uid!;
+            // await _courseCategoriesService.CreateCourseCategoryAsync(newCourse);
+            var res = await _authorService.CreateAuthor(author);
+            if (res.StatusCode == 200)
+            {
+                NavigationManager.NavigateTo("/authors");
+            }
+            // Optionally, you can navigate to the "Courses" page after creating the course
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            // Handle any exceptions (e.g., display an error message)
+        }
+        finally
+        {
+            isCreating = false;
+        }
+    }
+
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = new();
+
+    void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    void Cancel() => MudDialog.Cancel();
+}

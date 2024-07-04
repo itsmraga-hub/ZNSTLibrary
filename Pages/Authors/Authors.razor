@@ -1,0 +1,87 @@
+﻿@page "/authors"
+@using MudBlazor
+@using MudBlazor.Components
+@using ZNSTLibrary.Data.Models
+@using ZNSTLibrary.Services.Authors
+@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+@inject ILocalStorageService _localStorage
+@inject IAuthorService _authorService
+
+<MudContainer>
+    @if (authors == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <MudButton @onclick="OpenDialog" Variant="Variant.Filled" Color="Color.Primary">
+            Add Author
+        </MudButton>
+        <MudTable Items="@authors" T="Author" OnRowClick="OpenAuthorPage" @bind-SelectedItem="selectedAuthor">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">Authors</MudText>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh>Name</MudTh>
+                <MudTh>Description</MudTh>
+                <MudTh>Website</MudTh>
+                <MudTh>Email</MudTh>
+                <MudTh>Phone</MudTh>
+                <MudTh>City</MudTh>
+                <MudTh>Country</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Name">@context.Name</MudTd>
+                <MudTd DataLabel="Description">@context.Description</MudTd>
+                <MudTd DataLabel="Website">@context.Website</MudTd>
+                <MudTd DataLabel="Email">@context.Email</MudTd>
+                <MudTd DataLabel="Phone">@context.PhoneNumber</MudTd>
+                <MudTd DataLabel="City">@context.City</MudTd>
+                <MudTd DataLabel="Country">@context.Country</MudTd>
+            </RowTemplate>
+            <PagerContent>
+                <MudTablePager PageSizeOptions="new int[] { 10, 25, 50, 100, int.MaxValue }"
+                               RowsPerPageString="Rows per page:"
+                               InfoFormat="Page {0} of {1} ({2} items)"
+                               AllItemsText="All items"
+                               HorizontalAlignment="HorizontalAlignment.Center"
+                               HideRowsPerPage="false"
+                               HidePageNumber="false"
+                               HidePagination="false" />
+            </PagerContent>
+        </MudTable>
+    }
+</MudContainer>
+
+@code {
+    private List<Author> authors = new List<Author>();
+    private Author selectedAuthor = new Author();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var res = await _authorService.GetAuthors();
+        if (res != null)
+        {
+            authors = res;
+        }
+        else
+        {
+            // Handle error
+        }
+        // Fetch all authors from API
+        // Example: authors = await HttpClient.GetFromJsonAsync<List<Author>>("api/authors");
+    }
+
+    private void OpenDialog()
+    {
+        NavigationManager.NavigateTo("/authors/new");
+        // Logic to open a dialog for adding a new author
+    }
+
+    private void OpenAuthorPage(TableRowClickEventArgs<Author> tableRowClickEventArgs)
+    {
+        // Redirect to the author details page or edit page
+        NavigationManager.NavigateTo($"/author-details/{selectedAuthor.Id}");
+    }
+}

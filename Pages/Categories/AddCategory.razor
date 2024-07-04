@@ -1,0 +1,105 @@
+﻿@page "/categories/new"
+@attribute [Authorize(Roles = "Administrator,Instructor")]
+<PageTitle>Courses</PageTitle>
+
+@using Newtonsoft.Json
+@using ZNSTLibrary.Authentication
+@using ZNSTLibrary.Data.Models
+@using ZNSTLibrary.Services.Categories
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject ILocalStorageService _localStorage
+@inject ICategoriesService _categoriesService
+@inject NavigationManager NavigationManager
+
+<MudDialog>
+    <DialogContent>
+        <MudGrid>
+            <MudItem>
+                <MudText Typo="Typo.h4"><MudNavLink Href="/" Match="NavLinkMatch.Prefix">Codesome</MudNavLink></MudText>
+                <MudText Typo="Typo.h4">Create Category</MudText>
+            </MudItem>
+        </MudGrid>
+        <EditForm Model="@category" OnValidSubmit="OnValidSubmit">
+            <DataAnnotationsValidator />
+            <MudGrid>
+                <MudItem xs="12" sm="12">
+                    <MudCard>
+                        <MudCardContent>
+                            <MudGrid>
+                                <MudItem xs="12" sm="12">
+                                    <MudTextField Label="Category Title" HelperText="Max. 8 characters"
+                                                  @bind-Value="category.Name" For="@(() => category.Name)" />
+                                </MudItem>
+                                <MudItem xs="12" sm="12">
+                                    <MudTextField Label="Category description" HelperText="Category description"
+                                                     @bind-Value="category.Description" For="@(() => category.Description)" />
+                                </MudItem>
+                            </MudGrid>
+                        </MudCardContent>
+                        <MudCardActions>
+                            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Add Course Category</MudButton>
+                        </MudCardActions>
+                    </MudCard>
+                </MudItem>
+            </MudGrid>
+        </EditForm>
+    </DialogContent>
+    <DialogActions>        
+        <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@if (isCreating)
+{
+    <p><em>Creating...</em></p>
+}
+
+@code {
+    private Category category = new Category();
+    private bool isCreating = false;
+
+    private async void OnValidSubmit(EditContext context)
+    {
+        await CreateCourse();
+    }
+    private async Task CreateCourse()
+    {
+        try
+        {
+            isCreating = true;
+            // Get the current user's ID
+            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+            var uid = await _localStorage.GetItemAsync<string>("__id");
+            var customAuthenticationStateProvider = (CustomAuthenticationStateProvider)authenticationStateProvider;
+            var userSession = await customAuthenticationStateProvider.GetAuthenticatedUser();
+            // Console.WriteLine(JsonConvert.SerializeObject(authState));
+
+            // var user = authState.User;
+            // Console.WriteLine(JsonConvert.SerializeObject(userSession));
+            category.CreatedBy = uid!;
+
+            var res = await _categoriesService.CreateCategory(category);
+            Console.WriteLine(JsonConvert.SerializeObject(res));
+            if (res.StatusCode == 200)
+            {
+                Cancel();
+            }
+            // Optionally, you can navigate to the "Courses" page after creating the course
+            // NavigationManager.NavigateTo("/courses");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            // Handle any exceptions (e.g., display an error message)
+        }
+        finally
+        {
+            isCreating = false;
+        }
+    }
+
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = new();
+
+    void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    void Cancel() => MudDialog.Cancel();
+}

@@ -1,0 +1,43 @@
+﻿@page "/create-book-reservation"
+@using MudBlazor
+@using MudBlazor.Components
+@using ZNSTLibrary.Data.Models
+@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+
+<MudDialog>
+    <DialogContent>
+        <MudPaper Class="p-4">
+            <MudText Typo="Typo.h5">Create Book Reservation</MudText>
+            <EditForm Model="@bookReservation" OnValidSubmit="HandleValidSubmit">
+                <MudTextField Label="Book ID" @bind-Value="bookReservation.BookId" Required="true" />
+                <MudTextField Label="User ID" @bind-Value="bookReservation.UserId" Required="true" />
+                <MudDatePicker Label="Reservation Date" @bind-Value="bookReservation.ReservationDate" Required="true" />
+                <MudDatePicker Label="Expiry Date" @bind-Value="bookReservation.ExpiryDate" Required="true" />
+                <MudSwitch Label="Is Active" @bind-Value="bookReservation.IsActive" Color="Color.Success" />
+
+                <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled">Create Reservation</MudButton>
+            </EditForm>
+        </MudPaper>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private BookReservation bookReservation = new BookReservation();
+    private MudForm form = new MudForm();
+
+    private async Task HandleValidSubmit()
+    {
+        // API call to create book reservation
+        // await HttpClient.PostAsJsonAsync("api/bookReservations", bookReservation);
+        NavigationManager.NavigateTo("/book-reservations");
+    }
+
+    private void Cancel()
+    {
+        NavigationManager.NavigateTo("/book-reservations");
+    }
+}

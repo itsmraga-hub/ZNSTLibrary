@@ -1,0 +1,79 @@
+﻿@page "/publishers"
+@using MudBlazor
+@using MudBlazor.Components
+@using ZNSTLibrary.Data.Models
+@using ZNSTLibrary.Services.Publishers
+@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+@inject IPublisherService _publisherService
+
+<MudContainer>
+    @if (publishers == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <MudButton @onclick="OpenDialog" Variant="Variant.Filled" Color="Color.Primary">
+            Add Publisher
+        </MudButton>
+        <MudTable Items="@publishers" T="Publisher" OnRowClick="OpenPublisherPage" @bind-SelectedItem="selectedPublisher">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">Publishers</MudText>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh>Name</MudTh>
+                <MudTh>Description</MudTh>
+                <MudTh>Website</MudTh>
+                <MudTh>Email</MudTh>
+                <MudTh>Phone</MudTh>
+                <MudTh>City</MudTh>
+                <MudTh>Country</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Name">@context.Name</MudTd>
+                <MudTd DataLabel="Description">@context.Description</MudTd>
+                <MudTd DataLabel="Website">@context.Website</MudTd>
+                <MudTd DataLabel="Email">@context.Email</MudTd>
+                <MudTd DataLabel="Phone">@context.PhoneNumber</MudTd>
+                <MudTd DataLabel="City">@context.City</MudTd>
+                <MudTd DataLabel="Country">@context.Country</MudTd>
+            </RowTemplate>
+            <PagerContent>
+                <MudTablePager PageSizeOptions="new int[] { 10, 25, 50, 100, int.MaxValue }"
+                               RowsPerPageString="Rows per page:"
+                               InfoFormat="Page {0} of {1} ({2} items)"
+                               AllItemsText="All items"
+                               HorizontalAlignment="HorizontalAlignment.Center"
+                               HideRowsPerPage="false"
+                               HidePageNumber="false"
+                               HidePagination="false" />
+            </PagerContent>
+        </MudTable>
+    }
+</MudContainer>
+
+@code {
+    private List<Publisher> publishers = new List<Publisher>();
+    private Publisher selectedPublisher = new Publisher();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var res = await _publisherService.GetPublishers();
+        publishers = res!;
+        // Fetch all publishers from API
+        // Example: publishers = await HttpClient.GetFromJsonAsync<List<Publisher>>("api/publishers");
+    }
+
+    private void OpenDialog()
+    {
+        NavigationManager.NavigateTo("/publishers/new");
+        // Logic to open a dialog for adding a new publisher
+    }
+
+    void OpenPublisherPage(TableRowClickEventArgs<Publisher> tableRowClickEventArgs)
+    {
+        // Redirect to the publisher details page or edit page
+        NavigationManager.NavigateTo($"/publisher-details/{selectedPublisher.Id}");
+    }
+}

@@ -1,0 +1,33 @@
+﻿@page "/book-rental-details/{Id}"
+@using MudBlazor
+@using MudBlazor.Components
+@using ZNSTLibrary.Data.Models
+@inject HttpClient HttpClient
+
+<MudPaper Class="p-4">
+    @if (rental == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <MudText Typo="Typo.h5">Rental Details</MudText>
+        <MudText><strong>Book ID:</strong> @rental.BookId</MudText>
+        <MudText><strong>User ID:</strong> @rental.UserId</MudText>
+        <MudText><strong>Rental Date:</strong> @rental.RentalDate.ToShortDateString()</MudText>
+        <MudText><strong>Return Date:</strong> @rental.ReturnDate.ToShortDateString()</MudText>
+        <MudText><strong>Is Returned:</strong> @(rental.IsReturned ? "Yes" : "No")</MudText>
+    }
+</MudPaper>
+
+@code {
+    [Parameter]
+    public string Id { get; set; } = "";
+    private BookRental rental = new BookRental();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Fetch rental details by Id from API
+        // rental = await HttpClient.GetFromJsonAsync<BookRental>($"api/bookRentals/{Id}");
+    }
+}

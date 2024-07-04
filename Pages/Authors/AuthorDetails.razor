@@ -1,0 +1,39 @@
+﻿@page "/author-details/{Id}"
+@using MudBlazor
+@using MudBlazor.Components
+@using ZNSTLibrary.Data.Models
+@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+
+<MudContainer>
+    @if (author == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <MudText Typo="Typo.h4">@author.Name</MudText>
+        <MudText><strong>Description:</strong> @author.Description</MudText>
+        <MudText><strong>Website:</strong> @author.Website</MudText>
+        <MudText><strong>Email:</strong> @author.Email</MudText>
+        <MudText><strong>Phone:</strong> @author.PhoneNumber</MudText>
+        <MudText><strong>Address:</strong> @author.Address</MudText>
+        <MudText><strong>City:</strong> @author.City</MudText>
+        <MudText><strong>Country:</strong> @author.Country</MudText>
+        <MudText><strong>Postal Code:</strong> @author.PostalCode</MudText>
+        <MudText><strong>Photo:</strong> <img src="@author.PhotoUrl" alt="Author Photo" />
+            </MudText>
+    }
+</MudContainer>
+
+@code {
+    [Parameter]
+    public string Id { get; set; } = "";
+    private Author author = new Author();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Fetch author details by Id from API
+        // Example: author = await HttpClient.GetFromJsonAsync<Author>($"api/authors/{Id}");
+    }
+}

@@ -1,0 +1,112 @@
+﻿@page "/publishers/new"
+@using Newtonsoft.Json
+@using ZNSTLibrary.Authentication
+@using ZNSTLibrary.Data.Models
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject ILocalStorageService _localStorage
+@using ZNSTLibrary.Services.Publishers
+@inject IPublisherService _publishersService
+
+
+<EditForm Model="@publisher" OnValidSubmit="@HandleValidSubmit">
+    <MudCard>
+        <MudCardContent>
+            <MudGrid>
+                <MudItem md="4" xs="12">
+                    <MudTextField @bind-Value="publisher.Name" Label="Name" Required="true" />
+                </MudItem>
+                <MudItem md="4" xs="12">
+                    <MudTextField @bind-Value="publisher.Description" Label="Description" Required="true" />
+                </MudItem>
+                <MudItem md="4" xs="12">
+                    <MudTextField @bind-Value="publisher.LogoUrl" Label="Logo URL" Required="true" />
+                </MudItem>
+                <MudItem md="4" xs="12">
+                    <MudTextField @bind-Value="publisher.Website" Label="Website" Required="true" />
+                </MudItem>
+                <MudItem md="4" xs="12">
+                    <MudTextField @bind-Value="publisher.Email" Label="Email" Required="true" />
+                </MudItem>
+                <MudItem md="4" xs="12">
+                    <MudTextField @bind-Value="publisher.PhoneNumber" Label="Phone Number" Required="true" />
+                </MudItem>
+                <MudItem md="4" xs="12">
+                    <MudTextField @bind-Value="publisher.Address" Label="Address" Required="true" />
+                </MudItem>
+                <MudItem md="4" xs="12">
+                    <MudTextField @bind-Value="publisher.City" Label="City" Required="true" />
+                </MudItem>
+                <MudItem md="4" xs="12">
+                    <MudTextField @bind-Value="publisher.Country" Label="Country" Required="true" />
+                </MudItem>
+                <MudItem md="4" xs="12">
+                    <MudTextField @bind-Value="publisher.PostalCode" Label="Postal Code" Required="true" />
+                </MudItem>
+                <MudItem md="4" xs="12">
+                    <MudTextField @bind-Value="publisher.ContactPerson" Label="Contact Person" Required="true" />
+                </MudItem>
+                <MudItem md="4" xs="12">
+                    <MudTextField @bind-Value="publisher.ContactPersonEmail" Label="Contact Person Email" Required="true" />
+                </MudItem>
+                <MudItem md="4" xs="12">
+                    <MudTextField @bind-Value="publisher.ContactPersonPhoneNumber" Label="Contact Person Phone Number" Required="true" />
+                </MudItem>
+                <MudItem md="4" xs="12">
+                    <MudTextField @bind-Value="publisher.ContactPersonPosition" Label="Contact Person Position" Required="true" />
+                </MudItem>
+            </MudGrid>
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary">Add Publisher</MudButton>
+        </MudCardActions>
+    </MudCard>
+</EditForm>
+
+@code {
+    private Publisher publisher = new Publisher();
+    private bool isCreating = false;
+
+    private async void HandleValidSubmit()
+    {
+        await CreatePublisher();
+        // Handle form submission logic here
+        Console.WriteLine("Form submitted successfully!");
+    }
+
+    private async Task CreatePublisher()
+    {
+        try
+        {
+            isCreating = true;
+            // Get the current user's ID
+            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+            var uid = await _localStorage.GetItemAsync<string>("__id");
+            var customAuthenticationStateProvider = (CustomAuthenticationStateProvider)authenticationStateProvider;
+            var userSession = await customAuthenticationStateProvider.GetAuthenticatedUser();
+            // Console.WriteLine(JsonConvert.SerializeObject(authState));
+
+            // var user = authState.User;
+            // Console.WriteLine(JsonConvert.SerializeObject(userSession));
+            publisher.CreatedBy = uid!;
+
+            var res = await _publishersService.CreatePublisher(publisher);
+            Console.WriteLine(JsonConvert.SerializeObject(res));
+            if (res.StatusCode == 200)
+            {
+                // Cancel();
+            }
+            // Optionally, you can navigate to the "Courses" page after creating the course
+            NavigationManager.NavigateTo("/publishers");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            // Handle any exceptions (e.g., display an error message)
+        }
+        finally
+        {
+            isCreating = false;
+        }
+    }
+}

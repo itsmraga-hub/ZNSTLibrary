@@ -1,0 +1,188 @@
+﻿@page "/books/edit/{Id}"
+@attribute [Authorize(Roles = "Administrator,Instructor")]
+<PageTitle>Add book</PageTitle>
+
+@using Newtonsoft.Json
+@using ZNSTLibrary.Authentication
+@using ZNSTLibrary.Data.Models
+@using ZNSTLibrary.Pages.Categories
+@using ZNSTLibrary.Services.Books
+
+@inject AuthenticationStateProvider authenticationStateProvider
+
+@inject ILocalStorageService _localStorage
+
+@inject NavigationManager NavigationManager
+@inject IDialogService DialogService
+@inject IBooksService booksService
+
+
+<MudGrid>
+    <MudItem>
+        <MudText Typo="Typo.h4">Add book</MudText>
+    </MudItem>
+</MudGrid>
+<EditForm Model="@book" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator />
+    <MudCard>
+        <MudCardContent>
+            <MudGrid>
+                <MudItem xs="12" md="4">
+                    <MudTextField @bind-Value="book.Title" Label="Title" Required="true" Variant="Variant.Outlined" />
+                </MudItem>
+                <MudItem xs="12" md="4">
+                    <MudTextField @bind-Value="book.ISBN" Label="ISBN" Required="true" Variant="Variant.Outlined" />
+                </MudItem>
+                <MudItem xs="12" md="4">
+                    <MudTextField @bind-Value="book.Price" Label="Price" Required="true" Variant="Variant.Outlined" />
+                </MudItem>
+                <MudItem xs="12" md="4">
+                    <MudSwitch @bind-Checked="book.isAvailableForSale" Label="Available For Sale" />
+                </MudItem>
+                <MudItem xs="12" md="4">
+                    <MudSwitch @bind-Checked="book.isAvailableForBorrow" Label="Available For Borrow" />
+                </MudItem>
+                <MudItem xs="12" md="4">
+                    <MudSwitch @bind-Checked="book.isAvailableForReservation" Label="Available For Reservation" />
+                </MudItem>
+                <MudItem xs="12" md="4">
+                    <MudSwitch @bind-Checked="book.isAvailableForExchange" Label="Available For Exchange" />
+                </MudItem>
+                <MudItem xs="12" md="4">
+                    <MudTextField @bind-Value="book.AuthorName" Label="Author Name" Required="true" Variant="Variant.Outlined" />
+                </MudItem>
+                <MudItem xs="12" md="4">
+                    <MudTextField @bind-Value="book.PublisherId" Label="Publisher ID" Required="true" Variant="Variant.Outlined" />
+                </MudItem>
+                <MudItem xs="12" md="4">
+                    <MudTextField @bind-Value="book.CategoryId" Label="Category ID" Required="true" Variant="Variant.Outlined" />
+                </MudItem>
+                <MudItem xs="12" md="4">
+                    <MudTextField @bind-Value="book.Language" Label="Language" Required="true" Variant="Variant.Outlined" />
+                </MudItem>
+                <MudItem xs="12" md="4">
+                    <MudTextField @bind-Value="book.Pages" Label="Pages" Required="true" Variant="Variant.Outlined" />
+                </MudItem>
+                <MudItem xs="12" md="4">
+                    <MudTextField @bind-Value="book.Year" Label="Year" Required="true" Variant="Variant.Outlined" />
+                </MudItem>
+                <MudItem xs="12" md="12">
+                    <MudTextField @bind-Value="book.Description" Label="Description" Required="true" Variant="Variant.Outlined" />
+                </MudItem>
+                <MudItem xs="12" md="4">
+                    <MudTextField @bind-Value="book.CoverUrl" Label="Cover URL" Required="true" Variant="Variant.Outlined" />
+                </MudItem>
+                <MudItem xs="12" md="4">
+                    <MudTextField @bind-Value="book.AuthorId" Label="Author ID" Required="true" Variant="Variant.Outlined" />
+                </MudItem>
+                <MudItem xs="12" md="4">
+                    <MudTextField @bind-Value="book.AuthorUrl" Label="Author URL" Required="true" Variant="Variant.Outlined" />
+                </MudItem>
+                <MudItem xs="12" md="4">
+                    <MudTextField @bind-Value="book.BookUrl" Label="book URL" Required="true" Variant="Variant.Outlined" />
+                </MudItem>
+                <MudItem xs="12" md="4">
+                    <MudTextField @bind-Value="book.TitleUrl" Label="Title URL" Required="true" Variant="Variant.Outlined" />
+                </MudItem>
+                <MudItem xs="12" md="4">
+                    <MudTextField @bind-Value="book.NumberOfCopies" Label="Number Of Copies" Required="true" Variant="Variant.Outlined" />
+                </MudItem>
+                <MudItem xs="12" md="4">
+                    <MudTextField @bind-Value="book.NumberOfAvailableCopies" Label="Number Of Available Copies" Required="true" Variant="Variant.Outlined" />
+                </MudItem>
+                <MudItem xs="12" md="4">
+                    <MudTextField @bind-Value="book.NumberOfBorrowedCopies" Label="Number Of Borrowed Copies" Required="true" Variant="Variant.Outlined" />
+                </MudItem>
+                <MudItem xs="12" md="4">
+                    <MudTextField @bind-Value="book.NumberOfReservedCopies" Label="Number Of Reserved Copies" Required="true" Variant="Variant.Outlined" />
+                </MudItem>
+                <MudItem xs="12" md="4">
+                    <MudTextField @bind-Value="book.NumberOfLostCopies" Label="Number Of Lost Copies" Required="true" Variant="Variant.Outlined" />
+                </MudItem>
+                <MudItem xs="12" md="4">
+                    <MudTextField @bind-Value="book.NumberOfDamagedCopies" Label="Number Of Damaged Copies" Required="true" Variant="Variant.Outlined" />
+                </MudItem>
+            </MudGrid>
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary">Add Book</MudButton>
+        </MudCardActions>
+    </MudCard>
+</EditForm>
+
+
+@if (isCreating)
+{
+    <p><em>Creating...</em></p>
+}
+
+@code {
+    private Book book = new Book();
+    private bool isCreating = false;
+    private List<Category> categories = new List<Category>();
+
+    private IEnumerable<string> categoriesOptions { get; set; } = new HashSet<string>() { };
+    private string value { get; set; } = "Nothing selected";
+
+    private async void OnValidSubmit(EditContext context)
+    {
+        await AddNewbook();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // var res = await _categoriesService.GetCategoriesAsync();
+        // categories = res!;
+        // Console.WriteLine(JsonConvert.SerializeObject(categories));
+    }
+    private async Task AddNewbook()
+    {
+        try
+        {
+            isCreating = true;
+            // Get the current user's ID
+            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+            var uid = await _localStorage.GetItemAsync<string>("__id");
+            var customAuthenticationStateProvider = (CustomAuthenticationStateProvider)authenticationStateProvider;
+            var userSession = await customAuthenticationStateProvider.GetAuthenticatedUser();
+            // Console.WriteLine(JsonConvert.SerializeObject(authState));
+
+            // var user = authState.User;
+            Console.WriteLine(JsonConvert.SerializeObject(categoriesOptions));
+            book.AuthorId = uid!;
+            // await _courseCategoriesService.CreateCourseCategoryAsync(newCourse);
+            var res = booksService.CreateBook(book);
+            if (res != null)
+            {
+                for (int i = 0; i < categoriesOptions.Count(); i++)
+                {
+                    var categoryId = categoriesOptions.ToList()[i];
+                    // await _courseCategoriesService.CreateCourseCategoryAsync(categoryId, res.Id);
+                };
+            }
+            // Optionally, you can navigate to the "Courses" page after creating the course
+            NavigationManager.NavigateTo("/courses");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            // Handle any exceptions (e.g., display an error message)
+        }
+        finally
+        {
+            isCreating = false;
+        }
+    }
+
+
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = new();
+
+    void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    void Cancel() => MudDialog.Cancel();
+
+    void OpenAddCategoryModal()
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        DialogService.Show<AddCategory>("Add Category", options);
+    }
+}

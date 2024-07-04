@@ -1,0 +1,104 @@
+﻿@page "/all-system-users"
+@using MudBlazor
+@using MudBlazor.Components
+@using ZNSTLibrary.Data.Models
+@using ZNSTLibrary.Data.Services.Users
+@using ZNSTLibrary.Services.Books
+@using ZNSTLibrary.Services.Rentals
+@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+@inject IBookRentalService _bookRentalService
+@inject IBooksService booksService
+@inject IUserService usersService
+@inject IDialogService DialogService
+
+@if (users == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <MudButton @onclick="openAddUserModal" Variant="Variant.Filled" Color="Color.Primary">
+        Add User
+    </MudButton>
+    <MudTable Items="@users" T="User" @bind-SelectedItem="selectedUser">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">All System Users</MudText>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh></MudTh>
+            <MudTh>Role</MudTh>
+            <MudTh>Email</MudTh>
+            <MudTh>UserName</MudTh>
+            <MudTh>PhoneNumber</MudTh>
+            <MudTh>UpdateRole</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Return Date">@context.ProfilePictureUrl</MudTd>
+            <MudTd DataLabel="Book ID">@context.Role</MudTd>
+            <MudTd DataLabel="User ID">@context.Email</MudTd>
+            <MudTd DataLabel="UserName">@context.UserName</MudTd>
+            <MudTd DataLabel="Phone Number">@context.PhoneNumber</MudTd>
+            <MudTd>
+                @if(@context.Role == "Member")
+                {
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="() => makeStaff(context.Id)">Make Staff</MudButton>
+                }
+                else if(@context.Role == "Admin")
+                {
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="() => makeAdmin(context.Id)">Make Admin</MudButton>
+                }
+                else if(@context.Role == "Staff")
+                {
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="() => makeAdmin(context.Id)">Make Admin</MudButton>
+                }
+            </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[] { 10, 25, 50, 100 }" />
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+    private List<User> users = new List<User>();
+    private User selectedUser = new User();
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        var res = await usersService.GetUsers();
+
+        if (res != null)
+        {
+            users = res;
+        }
+    }
+
+    void OpenUserPage(TableRowClickEventArgs<Book> tableRowClickEventArgs)
+    {
+        NavigationManager.NavigateTo($"/user-details/{tableRowClickEventArgs.Item.Id}");
+    }
+
+    void openAddUserModal()
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        DialogService.Show<AddMember>("Add User", options);
+    }
+
+    void makeAdmin(string id)
+    {
+        var res = usersService.MakeAdmin(selectedUser.Id);
+    }
+
+    void makeMember(string id)
+    {
+        var res = usersService.MakeUser(selectedUser.Id);
+    }
+
+    void makeStaff(string id)
+    {
+        var res = usersService.MakeStaff(selectedUser.Id);
+    }
+
+}

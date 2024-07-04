@@ -1,0 +1,117 @@
+﻿@using Newtonsoft.Json
+@using ZNSTLibrary.Authentication
+@using ZNSTLibrary.Data.Models
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject ILocalStorageService _localStorage
+@using ZNSTLibrary.Services.Books
+@inject IBooksService _booksService
+<MudDialog>
+    <DialogContent>
+        <EditForm Model="@book" OnValidSubmit="@HandleValidSubmit">
+
+            <MudCard>
+                <MudCardContent>
+                    <MudGrid>
+                        <MudItem md="4" xs="12">
+                            <MudNumericField @bind-Value="book.NumberOfCopies" HideSpinButtons="true" Min="0" Label="Number of Copies" Variant="Variant.Outlined" Required="true" />
+                        </MudItem>
+                        <MudItem md="4" xs="12">
+                            <MudNumericField @bind-Value="book.NumberOfAvailableCopies" HideSpinButtons="true" Min="0" Label="Number of available copies" Variant="Variant.Outlined" Required="true" />
+                        </MudItem>
+                        <MudItem md="4" xs="12">
+                            <MudNumericField @bind-Value="book.NumberOfBorrowedCopies" HideSpinButtons="true" Min="0" Label="Number of Borrowed copies" Variant="Variant.Outlined" Required="true" />
+                        </MudItem>
+                        <MudItem md="4" xs="12">
+                            <MudNumericField @bind-Value="book.NumberOfDamagedCopies" HideSpinButtons="true" Min="0" Label="Number of Damaged copies" Variant="Variant.Outlined" Required="true" />
+                        </MudItem>
+                        <MudItem md="4" xs="12">
+                            <MudNumericField @bind-Value="book.NumberOfLostCopies" HideSpinButtons="true" Min="0" Label="Number of Lost copies" Variant="Variant.Outlined" Required="true" />
+                        </MudItem>
+                        <MudItem md="4" xs="12">
+                            <MudNumericField @bind-Value="book.NumberOfReservedCopies" HideSpinButtons="true" Min="0" Label="Number of Reserved copies" Variant="Variant.Outlined" Required="true" />
+                        </MudItem>
+                        <MudItem xs="12" md="4">
+                        <MudSwitch @bind-Value="book.isAvailableForSale" Label="Available For Sale" Color="Color.Success" />
+                        </MudItem>
+                        <MudItem xs="12" md="4">
+                            <MudSwitch @bind-Value="book.isAvailableForBorrow" Label="Available For Borrow" Color="Color.Success" />
+                        </MudItem>
+                        <MudItem xs="12" md="4">
+                            <MudSwitch @bind-Value="book.isAvailableForReservation" Label="Available For Reservation" Color="Color.Success" />
+                        </MudItem>
+                        <MudItem xs="12" md="4">
+                            <MudSwitch @bind-Value="book.isAvailableForExchange" Label="Available For Exchange" Color="Color.Success" />
+                        </MudItem>
+                    </MudGrid>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary">Update Availability</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public Book book { get; set; } = new Book();
+    private bool isCreating = false;
+
+    private async void HandleValidSubmit()
+    {
+        await UpdatePublisher();
+        // Handle form submission logic here
+        Console.WriteLine("Form submitted successfully!");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Console.WriteLine(book.Id);
+        // Fetch book details by Id from API
+        // Example: book = await HttpClient.GetFromJsonAsync<Book>($"api/books/{Id}");
+    }
+
+    private async Task UpdatePublisher()
+    {
+        try
+        {
+            isCreating = true;
+            // Get the current user's ID
+            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+            var uid = await _localStorage.GetItemAsync<string>("__id");
+            var customAuthenticationStateProvider = (CustomAuthenticationStateProvider)authenticationStateProvider;
+            var userSession = await customAuthenticationStateProvider.GetAuthenticatedUser();
+            // Console.WriteLine(JsonConvert.SerializeObject(authState));
+
+            // var user = authState.User;
+            // Console.WriteLine(JsonConvert.SerializeObject(userSession));
+            book.UpdatedBy = uid!;
+
+            var res = await _booksService.UpdateBook(book.Id, book);
+            Console.WriteLine(JsonConvert.SerializeObject(res));
+            if (res.StatusCode == 200)
+            {
+                Cancel();
+            }
+            // Optionally, you can navigate to the "Courses" page after creating the course
+            // NavigationManager.NavigateTo("/courses");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            // Handle any exceptions (e.g., display an error message)
+        }
+        finally
+        {
+            isCreating = false;
+        }
+    }
+
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = new();
+
+    void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    void Cancel() => MudDialog.Cancel();
+}

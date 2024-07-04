@@ -1,0 +1,87 @@
+﻿@page "/create-book-rental"
+@using MudBlazor
+@using MudBlazor.Components
+@using ZNSTLibrary.Data.Models
+@using ZNSTLibrary.Data.Services.Users
+@using ZNSTLibrary.Services.Books
+@using ZNSTLibrary.Services.Rentals
+@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+@inject IBookRentalService _bookRentalService
+@inject IBooksService booksService
+@inject IUserService usersService
+
+<MudDialog>
+    <DialogContent>
+        <MudPaper Class="p-4">
+            <MudText Typo="Typo.h5">Create Book Rental</MudText>
+            <EditForm Model="@bookRental" OnValidSubmit="HandleValidSubmit">
+                <DataAnnotationsValidator />
+                <MudSelect T="string" Required="true" HelperText="@value" @bind-Value="bookRental.BookId" Variant="Variant.Outlined" Label="Select Book" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown">
+                    @foreach (var book in books)
+                    {
+                        <MudSelectItem T="string" Value="@book.Id">@book.Title</MudSelectItem>
+                    }
+                </MudSelect>
+                <MudSelect T="string" Required="true" HelperText="@value" @bind-Value="bookRental.UserId" Variant="Variant.Outlined" Label="Select Member" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown">
+                    @foreach (var user in users)
+                    {
+                        <MudSelectItem T="string" Value="@user.Id">@user.FirstName @user.LastName</MudSelectItem>
+                    }
+                </MudSelect>
+                <MudDatePicker Label="Rental Date" @bind-Value="rentalDate" Required="true" />
+                <MudDatePicker Label="Return Date" @bind-Value="returnDate" Required="true" />
+                <MudSwitch Label="Is Returned" @bind-Value="bookRental.IsReturned" Color="Color.Success" />
+
+                <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled">Create Rental</MudButton>
+            </EditForm>
+        </MudPaper>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private BookRental bookRental = new BookRental();
+    private MudForm form = new MudForm();
+    private List<Book> books = new List<Book>();
+    private List<User> users = new List<User>();
+
+    private DateTime rentalDate = DateTime.Now;
+    private DateTime returnDate = DateTime.Now;
+
+    private string value = "Select a book";
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        var res = await booksService.GetBooks();
+        var res2 = await usersService.GetUsers("Member");
+
+        if (res != null)
+        {
+            books = res;
+            users = res2;
+        }
+    }
+
+
+    private async Task HandleValidSubmit()
+    {
+        bookRental.RentalDate = rentalDate;
+        bookRental.ReturnDate = returnDate;
+        var res = await _bookRentalService.CreateBookRental(bookRental);
+        if (res.StatusCode == 200)
+        {
+            // API call to create book rental
+            // await HttpClient.PostAsJsonAsync("api/bookRentals", bookRental);
+            NavigationManager.NavigateTo("/book-rentals");
+        }
+    }
+
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = new();
+
+    void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    void Cancel() => MudDialog.Cancel();
+}

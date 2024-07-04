@@ -1,0 +1,64 @@
+﻿@using ZNSTLibrary.Authentication
+@inherits LayoutComponentBase
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject ILocalStorageService LocalStorage
+
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <AuthorizeView>
+        <Authorized>
+            <MudAppBar>
+                <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+                codesome
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" OnClick="LogOut" Class="ml-auto">Logout</MudButton>
+            </MudAppBar>
+            <MudDrawer @bind-Open="@_drawerOpen">
+                <NavMenu />
+            </MudDrawer>
+            <MudMainContent Class="pt-5 mt-lg-5 flex-column align-content-center justify-content-center" Style="border: 1px solid red;">
+                <MudSpacer />
+                <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="pt-5 mt-lg-5">
+                    @Body
+                </MudContainer>
+            </MudMainContent>
+        </Authorized>
+        <NotAuthorized>
+            <MudAppBar Elevation="4" Dense="true">
+                <MudText Style="color: black">Codesome</MudText>
+                <MudSpacer />
+                <div class="d-flex flex-row align-center gap-6 justify-center">
+                    <MudNavLink Href="/register" Match="NavLinkMatch.All">Register</MudNavLink>
+                    <MudNavLink Href="/login" Match="NavLinkMatch.All">Login</MudNavLink>
+                </div>
+            </MudAppBar>
+            <MudMainContent Class="pa-2 mt-lg-5">
+                <MudContainer Class="mt-lg-5">
+                    <MudContainer Class="mt-lg-5">
+                        @Body
+                    </MudContainer>
+                </MudContainer>
+            </MudMainContent>
+        </NotAuthorized>
+    </AuthorizeView>
+
+</MudLayout>
+
+@code {
+    bool _drawerOpen = true;
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+    private async Task LogOut()
+    {
+        var customAuthState = (CustomAuthenticationStateProvider)AuthenticationStateProvider;
+        await customAuthState.UpdateAuthenticationState(null!);
+        await LocalStorage.ClearAsync();
+        NavigationManager.NavigateTo("/", true);
+    }
+}
